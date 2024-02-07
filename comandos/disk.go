@@ -1,0 +1,5 @@
+package comandos
+
+func DiskCommandProps() {
+
+}

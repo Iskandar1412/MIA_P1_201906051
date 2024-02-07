@@ -1,0 +1,7 @@
+# Trasladar de Windows a Ubuntu
+
+scp <archivo>.<extension> <usuarioUbuntu>@<ip>:/direccion
+
+# Obtener de Ubuntu a Windows
+
+scp <usuarioUbuntu>@<ip>:/direccion/<nombreArchivo>.<extension> .
