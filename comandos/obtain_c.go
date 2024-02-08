@@ -88,7 +88,7 @@ func Execute(x []string) []string {
 
 func TienePath(x string) string {
 	y := strings.Split(x, "=")
-	fmt.Print("\t\t\t\t\t\t\t\tBuscando:")
+	fmt.Print("\t\t\t\t\t\t\tBuscando:")
 	color.Yellow(y[1])
 	if _, err := os.Stat(y[1]); os.IsNotExist(err) {
 		color.Red("Archivo No Encontrado")
@@ -111,13 +111,27 @@ func ExecuteFunc(x string) []string {
 	var lineas []string
 
 	for scanner.Scan() {
-		lineas = append(lineas, scanner.Text())
+		linea := strings.TrimSpace(scanner.Text())
+		if len(linea) > 0 && !strings.HasPrefix(linea, "#") {
+			lineas = append(lineas, linea)
+		}
 	}
 
+	var exportar []string
+	reg := regexp.MustCompile(`(.*?)\s*(?:#.*|$)`)
+	for _, y := range lineas {
+		match := reg.FindStringSubmatch(y)
+		//fmt.Println(y, "asdf")
+		if len(match) > 1 {
+			exportar = append(exportar, match[1])
+			//fmt.Println(match[0], "///", match[1])
+		}
+	}
+	//fmt.Println(exportar)
 	if err := scanner.Err(); err != nil {
 		color.Red("Error en la lectura del archivo:", err)
 		return nil
 	}
 
-	return lineas
+	return exportar
 }

@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 // MIA_P1_201906051/structures
@@ -23,16 +25,19 @@ func main() {
 		input = strings.TrimSpace(input)
 
 		if strings.ToLower(input) == "exit" {
-			fmt.Println("Saliendo del programa")
+			color.Cyan("Saliendo del programa")
 			break
 		} else {
 			instrucciones := comandos.ObtenerComandos(input)
 			if strings.HasPrefix(strings.ToLower(input), "execute") {
 				//fmt.Println(instrucciones)
 				ejecutar := comandos.Execute(instrucciones)
-				fmt.Println(ejecutar)
+				comandos.GlobalCom(ejecutar)
 			} else {
-				fmt.Println("comendo erroneo")
+				//fmt.Println("comendo erroneo")
+				var ejecutar []string
+				ejecutar = append(ejecutar, input)
+				comandos.GlobalCom(ejecutar)
 			}
 			//fmt.Println("instruciones", instrucciones)
 			//fmt.Println(len(instrucciones))
