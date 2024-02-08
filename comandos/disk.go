@@ -1,5 +1,5 @@
 package comandos
 
-func DiskCommandProps() {
+func DiskCommandProps(x string, c string) {
 
 }

@@ -11,7 +11,7 @@ import (
 
 // MIA_P1_201906051/structures
 // MIA_P1_201906051/size
-//var usa = "execute -path=/home/Escritorio/calificacion.adsj -name="kasdf" -fs=5 -T=B"
+//execute -path=/home/iskandar/Escritorio/prueba.adsj
 
 func main() {
 	fmt.Println("PROY1 - 201906051 - Juan Urbina")
@@ -28,7 +28,9 @@ func main() {
 		} else {
 			instrucciones := comandos.ObtenerComandos(input)
 			if strings.HasPrefix(strings.ToLower(input), "execute") {
-				fmt.Println(instrucciones)
+				//fmt.Println(instrucciones)
+				ejecutar := comandos.Execute(instrucciones)
+				fmt.Println(ejecutar)
 			} else {
 				fmt.Println("comendo erroneo")
 			}
