@@ -38,9 +38,9 @@ func CrearCarpeta() {
 			return
 		}
 
-		color.Green("\t\t\t\t\t\t\t\t\t\t\t\tCarpeta MIA/P1 creada correctamente")
+		color.Green("\t\t\t\t\t\t\tCarpeta MIA/P1 creada correctamente")
 	} else {
-		color.Yellow("\t\t\t\t\t\t\t\t\t\t\t\tCarpeta MIA/P1 ya existente")
+		color.Yellow("\t\t\t\t\t\t\tCarpeta MIA/P1 ya existente")
 	}
 
 	if _, err := os.Stat(nombreArchivo); os.IsNotExist(err) {
@@ -57,15 +57,14 @@ func CrearCarpeta() {
 			color.Red("Error escribiendo archivo:", err)
 			return
 		}
-		color.Green("\t\t\t\t\t\t\t\t\t\t\t\tArchivo creado correctamente")
+		color.Green("\t\t\t\t\t\t\tArchivo creado correctamente")
 	} else {
-		color.Yellow("\t\t\t\t\t\t\t\t\t\t\t\tArchivo existente")
+		color.Yellow("\t\t\t\t\t\t\tArchivo existente")
 	}
 }
 
 func Execute(x []string) []string {
 	for _, y := range x {
-		//fmt.Println(len(x), y)
 		var path string
 		if strings.HasPrefix(strings.ToLower(y), "path") {
 			path = TienePath(y)
@@ -75,11 +74,8 @@ func Execute(x []string) []string {
 			break
 		}
 		if path == "nil" {
-			//fmt.Println("NOOOOOOOO")
 			return nil
 		} else {
-			//color.Blue(path)
-			//fmt.Println(len(ExecuteFunc(path)))
 			return ExecuteFunc(path)
 		}
 	}
@@ -88,7 +84,7 @@ func Execute(x []string) []string {
 
 func TienePath(x string) string {
 	y := strings.Split(x, "=")
-	fmt.Print("\t\t\t\t\t\t\t\tBuscando:")
+	fmt.Print("\t\t\t\t\t\t\tBuscando:")
 	color.Yellow(y[1])
 	if _, err := os.Stat(y[1]); os.IsNotExist(err) {
 		color.Red("Archivo No Encontrado")
@@ -111,13 +107,27 @@ func ExecuteFunc(x string) []string {
 	var lineas []string
 
 	for scanner.Scan() {
-		lineas = append(lineas, scanner.Text())
+		linea := strings.TrimSpace(scanner.Text())
+		if len(linea) > 0 && !strings.HasPrefix(linea, "#") {
+			lineas = append(lineas, linea)
+		}
 	}
 
+	var exportar []string
+	reg := regexp.MustCompile(`(.*?)\s*(?:#.*|$)`)
+	for _, y := range lineas {
+		match := reg.FindStringSubmatch(y)
+		//fmt.Println(y, "asdf")
+		if len(match) > 1 {
+			exportar = append(exportar, match[1])
+			//fmt.Println(match[0], "///", match[1])
+		}
+	}
+	//fmt.Println(exportar)
 	if err := scanner.Err(); err != nil {
 		color.Red("Error en la lectura del archivo:", err)
 		return nil
 	}
 
-	return lineas
+	return exportar
 }
