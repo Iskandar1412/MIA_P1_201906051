@@ -38,9 +38,9 @@ func CrearCarpeta() {
 			return
 		}
 
-		color.Green("\t\t\t\t\t\t\t\t\t\t\t\tCarpeta MIA/P1 creada correctamente")
+		color.Green("\t\t\t\t\t\t\tCarpeta MIA/P1 creada correctamente")
 	} else {
-		color.Yellow("\t\t\t\t\t\t\t\t\t\t\t\tCarpeta MIA/P1 ya existente")
+		color.Yellow("\t\t\t\t\t\t\tCarpeta MIA/P1 ya existente")
 	}
 
 	if _, err := os.Stat(nombreArchivo); os.IsNotExist(err) {
@@ -57,15 +57,14 @@ func CrearCarpeta() {
 			color.Red("Error escribiendo archivo:", err)
 			return
 		}
-		color.Green("\t\t\t\t\t\t\t\t\t\t\t\tArchivo creado correctamente")
+		color.Green("\t\t\t\t\t\t\tArchivo creado correctamente")
 	} else {
-		color.Yellow("\t\t\t\t\t\t\t\t\t\t\t\tArchivo existente")
+		color.Yellow("\t\t\t\t\t\t\tArchivo existente")
 	}
 }
 
 func Execute(x []string) []string {
 	for _, y := range x {
-		//fmt.Println(len(x), y)
 		var path string
 		if strings.HasPrefix(strings.ToLower(y), "path") {
 			path = TienePath(y)
@@ -75,11 +74,8 @@ func Execute(x []string) []string {
 			break
 		}
 		if path == "nil" {
-			//fmt.Println("NOOOOOOOO")
 			return nil
 		} else {
-			//color.Blue(path)
-			//fmt.Println(len(ExecuteFunc(path)))
 			return ExecuteFunc(path)
 		}
 	}
