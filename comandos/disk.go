@@ -1,7 +1,6 @@
 package comandos
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/fatih/color"
@@ -25,10 +24,11 @@ func DiskCommandProps(command string, instructions []string) {
 
 	if strings.ToUpper(command) == "MKDISK" {
 		_size, _fit, _unit = Values_MKDISK(instructions)
-		if _size == 0 {
+		if _size <= 0 {
 			color.Yellow("[MKDISK]: Error to size value for this disk")
 		} else {
-			fmt.Println(_size, string(_fit), string(_unit))
+			MKDISK_Create(_size, _fit, _unit)
+			//fmt.Println(_size, string(_fit), string(_unit))
 		}
 	} else if strings.ToUpper(command) == "FDISK" {
 

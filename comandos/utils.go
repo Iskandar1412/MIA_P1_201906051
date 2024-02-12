@@ -1,10 +1,13 @@
 package comandos
 
 import (
+	"MIA_P1_201906051/structures"
 	"bytes"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/fatih/color"
 )
@@ -125,4 +128,56 @@ func TieneEntero(valor string) int64 {
 		return 0
 	}
 	return int64(i)
+}
+
+func ObFechaInt() int64 {
+	fecha := time.Now()
+	timestamp := fecha.Unix()
+	//fmt.Println(timestamp)
+	return int64(timestamp)
+}
+
+func IntFechaToStr(fecha int64) string {
+	formato := "2006-01-02 - 15:04:05"
+	fech := time.Unix(fecha, 0)
+	fechaFormat := fech.Format(formato)
+	//fmt.Println(fechaFormat)
+	return fechaFormat
+}
+
+func PartitionVacia() structures.Partition {
+	var partition structures.Partition
+	partition.Part_status = '\x00'
+	partition.Part_type = 'P'
+	partition.Part_fit = 'F'
+	partition.Part_start = -1
+	partition.Part_s = -1
+	for i := 0; i < len(partition.Part_name); i++ {
+		partition.Part_name[i] = '\x00'
+	}
+	partition.Part_correlative = -1
+	for i := 0; i < len(partition.Part_id); i++ {
+		partition.Part_id[i] = '\x00'
+	}
+	return partition
+}
+
+func ObDiskSignature() int64 {
+	source := rand.NewSource(time.Now().UnixNano())
+	numberR := rand.New(source)
+	signature := numberR.Intn(1000000) + 1
+	//fmt.Println(signature)
+	return int64(signature)
+}
+
+func Tamano(size int64, unit byte) int64 {
+	if unit == 'B' {
+		return size
+	} else if unit == 'K' {
+		return size * 1024
+	} else if unit == 'M' {
+		return size * 1048576
+	} else {
+		return 0
+	}
 }
