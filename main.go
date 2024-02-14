@@ -16,7 +16,7 @@ import (
 //execute -path=/home/iskandar/Escritorio/prueba.adsj
 
 func main() {
-	fmt.Println("PROY1 - 201906051 - Juan Urbina")
+	color.Blue("PROY1 - 201906051 - Juan Urbina")
 	comandos.CrearCarpeta()
 	for {
 		reader := bufio.NewReader(os.Stdin)

@@ -30,7 +30,11 @@ func ObtenerComandos(x string) []string {
 
 func CrearCarpeta() {
 	nombre := "MIA/P1"
+	reportes := "MIA/P1/Reports"
+	discos := "MIA/P1/Disks"
 	nombreArchivo := "MIA/CarpetaImagenes.txt"
+	git1 := "MIA/P1/Reports/.gitignore"
+	git2 := "MIA/P1/Disks/.gitignore"
 	if _, err := os.Stat(nombre); os.IsNotExist(err) {
 		err := os.MkdirAll(nombre, 0777)
 		if err != nil {
@@ -41,6 +45,28 @@ func CrearCarpeta() {
 		color.Green("\t\t\t\t\t\t\tCarpeta MIA/P1 creada correctamente")
 	} else {
 		color.Yellow("\t\t\t\t\t\t\tCarpeta MIA/P1 ya existente")
+	}
+
+	if _, err := os.Stat(reportes); os.IsNotExist(err) {
+		err := os.Mkdir(reportes, 0777)
+		if err != nil {
+			color.Red("Error al crear carpeta", err)
+			return
+		}
+		color.Green("\t\t\t\t\t\t\tCarpeta MIA/P1/Reports creada correctamente")
+	} else {
+		color.Yellow("\t\t\t\t\t\t\tCarpeta MIA/P1/Reports ya existente")
+	}
+
+	if _, err := os.Stat(discos); os.IsNotExist(err) {
+		err := os.Mkdir(discos, 0777)
+		if err != nil {
+			color.Red("Error al crear carpeta", err)
+			return
+		}
+		color.Green("\t\t\t\t\t\t\tCarpeta MIA/P1/Disks creada correctamente")
+	} else {
+		color.Yellow("\t\t\t\t\t\t\tCarpeta MIA/P1/Disks ya existente")
 	}
 
 	if _, err := os.Stat(nombreArchivo); os.IsNotExist(err) {
@@ -57,6 +83,30 @@ func CrearCarpeta() {
 			color.Red("Error escribiendo archivo:", err)
 			return
 		}
+		color.Green("\t\t\t\t\t\t\tArchivo creado correctamente")
+	} else {
+		color.Yellow("\t\t\t\t\t\t\tArchivo existente")
+	}
+
+	if _, err := os.Stat(git1); os.IsNotExist(err) {
+		archivo, err := os.Create(git1)
+		if err != nil {
+			fmt.Println("Error al crear archivo")
+			return
+		}
+		defer archivo.Close()
+		color.Green("\t\t\t\t\t\t\tArchivo creado correctamente")
+	} else {
+		color.Yellow("\t\t\t\t\t\t\tArchivo existente")
+	}
+
+	if _, err := os.Stat(git2); os.IsNotExist(err) {
+		archivo, err := os.Create(git2)
+		if err != nil {
+			fmt.Println("Error al crear archivo")
+			return
+		}
+		defer archivo.Close()
 		color.Green("\t\t\t\t\t\t\tArchivo creado correctamente")
 	} else {
 		color.Yellow("\t\t\t\t\t\t\tArchivo existente")
