@@ -11,7 +11,7 @@ import (
 )
 
 func ReportCommandProps(name string, instructions []string) {
-	path := "MIA/P1/Disks/A.dsk"
+	path := "MIA/P1/Disks/"
 	/*
 		var _name string
 		var _path string

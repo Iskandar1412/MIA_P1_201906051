@@ -4,9 +4,33 @@ import (
 	"MIA_P1_201906051/structures"
 	"encoding/binary"
 	"os"
+	"strings"
 
 	"github.com/fatih/color"
 )
+
+// MKDISK
+
+func Values_MKDISK(instructions []string) (int64, byte, byte) {
+	var _size int64
+	var _fit byte = 'F'
+	var _unit byte = 'M'
+	for _, valor := range instructions {
+		if strings.HasPrefix(strings.ToLower(valor), "size") {
+			var value = TieneSize("MKDISK", valor)
+			_size = value
+		} else if strings.HasPrefix(strings.ToLower(valor), "fit") {
+			var value = TieneFit("MKDISK", valor)
+			_fit = value
+		} else if strings.HasPrefix(strings.ToLower(valor), "unit") {
+			var value = TieneUnit("mkdisk", valor)
+			_unit = value
+		} else {
+			color.Yellow("[MKDISK]: Atributo no reconocido")
+		}
+	}
+	return _size, _fit, _unit
+}
 
 func MKDISK_Create(_size int64, _fit byte, _unit byte) {
 	directorio := "MIA/P1/Disks/"
@@ -57,4 +81,51 @@ func CreateFile(archivo string, _size int64, _fit byte, _unit byte) {
 		color.Red("Error al escribir datos del MBR")
 		return
 	}
+}
+
+// RMDISK
+
+func Values_RMDISK(instructions []string) (byte, bool) {
+	var _drivedeletter byte = '0'
+	for _, valor := range instructions {
+		if strings.HasPrefix(strings.ToLower(valor), "drivedeletter") {
+			var value = TieneDriveDeLetter("RMDISK", valor)
+			_drivedeletter = value
+			break
+		} else {
+			color.Yellow("[RMDISK]: Atributo no reconocido")
+			_drivedeletter = '0'
+			break
+		}
+	}
+	if _drivedeletter == '0' {
+		return '0', false
+	} else {
+		return _drivedeletter, true
+	}
+}
+
+func RMDISK_EXECUTE(_drivedeletter byte) {
+	PATH := "MIA/P1/Disks/" + string(_drivedeletter) + ".dsk"
+	if _, err := os.Stat(PATH); os.IsNotExist(err) {
+		color.Red("[RMDISK]: No existe el disco")
+		return
+	}
+	err := os.Remove(PATH)
+	if err != nil {
+		color.Red("[RMDISK]: Error al borrar el disco")
+		return
+	}
+	color.Green("[RMDISK]: Disco '" + string(_drivedeletter) + ".dsk' Borrado")
+}
+
+// Globals
+
+var Max_logical_partitions int64 = 23
+var Mounted_prefix int64 = 17
+
+// FDISK
+
+func Get_current_partition(id string) {
+
 }

@@ -13,7 +13,7 @@ func DiskCommandProps(command string, instructions []string) {
 	var _fit byte   //mkdisk  fdisk
 	var _unit byte  //mkdisk  fdisk
 	/*
-		var _drivedeletter string //rmdisk  fdisk mount
+		var _drivedeletter byte   //rmdisk  fdisk mount
 		var _name string          //fdisk   mount
 		var _type string          //fdisk   mkfs
 		var _delete string        //fdisk
@@ -24,16 +24,20 @@ func DiskCommandProps(command string, instructions []string) {
 
 	if strings.ToUpper(command) == "MKDISK" {
 		_size, _fit, _unit = Values_MKDISK(instructions)
-		if _size <= 0 {
-			color.Yellow("[MKDISK]: Error to size value for this disk")
+		if _size <= 0 || _fit == '0' || _unit == '0' {
+			color.Yellow("[MKDISK]: Error to asign values")
 		} else {
 			MKDISK_Create(_size, _fit, _unit)
-			//fmt.Println(_size, string(_fit), string(_unit))
 		}
 	} else if strings.ToUpper(command) == "FDISK" {
 
 	} else if strings.ToUpper(command) == "RMDISK" {
-
+		_drivedeletter, _error := Values_RMDISK(instructions)
+		if _drivedeletter == '0' && _error == false {
+			color.Yellow("[RMDISK]: Error to asign values")
+		} else {
+			RMDISK_EXECUTE(_drivedeletter)
+		}
 	} else if strings.ToUpper(command) == "MOUNT" {
 
 	} else if strings.ToUpper(command) == "UNMOUNT" {
@@ -43,8 +47,4 @@ func DiskCommandProps(command string, instructions []string) {
 	} else {
 		color.Red("[DiskComandProps]: Internal Error")
 	}
-}
-
-func D_MKDISK() {
-
 }
