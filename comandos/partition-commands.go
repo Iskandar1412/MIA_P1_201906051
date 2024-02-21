@@ -3,6 +3,7 @@ package comandos
 import (
 	"MIA_P1_201906051/size"
 	"MIA_P1_201906051/structures"
+	"fmt"
 	"strings"
 
 	"github.com/fatih/color"
@@ -81,8 +82,8 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 	}
 
 	//Verificar si existe partición extendida
-	if ExisteExtendida(tempDisk) {
-		color.Magenta("[FDISK]: Ya hay una partición extendida")
+	if ExisteExtendida(tempDisk, _type) {
+		color.Magenta("[FDISK]: Ya hay una partición extendida, " + string(_name) + " no puede ser extendida")
 		return
 	}
 
@@ -98,7 +99,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 	temp_p.Part_fit = _fit
 	temp_p.Part_start = int32(0)
 	temp_p.Part_s = Tamano(_size, _unit)
-	copy(temp_p.Part_name[:], _name)
+	temp_p.Part_name = DevolverNombreByte(string(_name))
 
 	ebr := structures.EBR{}
 	ebr.Part_mount = '0'
@@ -106,12 +107,14 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 	ebr.Part_start = int32(0)
 	ebr.Part_s = Tamano(_size, _unit)
 	ebr.Part_next = int32(-1)
-	copy(ebr.Name[:], _name)
+	ebr.Name = DevolverNombreByte(string(_name))
+	temp_p.Part_name = DevolverNombreByte(string(_name))
 	DiscoCreado := false
 	correlative := 0
 
 	// Primaria o Extendida
 	if _type == 'E' || _type == 'P' {
+		fmt.Println("\t\t\t\t\tPartición primaria o extendida", string(_name))
 		//Agregar al primero todos vacios
 		if tempDisk.Mbr_partitions[0].Part_status == int8(-1) && tempDisk.Mbr_partitions[1].Part_status == int8(-1) && tempDisk.Mbr_partitions[2].Part_status == int8(-1) && tempDisk.Mbr_partitions[3].Part_status == int8(-1) {
 			temp_p.Part_start = int32(size.SizeMBR())
@@ -122,7 +125,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 
 			//Para el segundo (1 lleno)
 		} else if tempDisk.Mbr_partitions[0].Part_status == int8(0) && tempDisk.Mbr_partitions[1].Part_status == int8(-1) && tempDisk.Mbr_partitions[2].Part_status == int8(-1) && tempDisk.Mbr_partitions[3].Part_status == int8(-1) {
-			temp_p.Part_start = int32(size.SizeMBR()) + tempDisk.Mbr_partitions[0].Part_s + 1
+			temp_p.Part_start = int32(size.SizeMBR()) + tempDisk.Mbr_partitions[0].Part_s
 			correlative = 2
 			temp_p.Part_correlative = int32(correlative)
 			DiscoCreado = true
@@ -134,7 +137,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 
 			//Para el tercero (1, 2 llenos)
 		} else if tempDisk.Mbr_partitions[0].Part_status == int8(0) && tempDisk.Mbr_partitions[1].Part_status == int8(0) && tempDisk.Mbr_partitions[2].Part_status == int8(-1) && tempDisk.Mbr_partitions[3].Part_status == int8(-1) {
-			temp_p.Part_start = int32(size.SizeMBR()) + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+			temp_p.Part_start = int32(size.SizeMBR()) + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s
 			correlative = 3
 			temp_p.Part_correlative = int32(correlative)
 			DiscoCreado = true
@@ -146,7 +149,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 
 			//Para el cuarto (1, 2, 3, llenos)
 		} else if tempDisk.Mbr_partitions[0].Part_status == int8(0) && tempDisk.Mbr_partitions[1].Part_status == int8(0) && tempDisk.Mbr_partitions[2].Part_status == int8(0) && tempDisk.Mbr_partitions[3].Part_status == int8(-1) {
-			temp_p.Part_start = int32(size.SizeMBR()) + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+			temp_p.Part_start = int32(size.SizeMBR()) + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s
 			correlative = 4
 			temp_p.Part_correlative = int32(correlative)
 			DiscoCreado = true
@@ -203,14 +206,14 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 						if tempDisk.Mbr_partitions[0].Part_s < int32(menor_size) {
 							numero_e = 1
 							menor_size = int(tempDisk.Mbr_partitions[0].Part_s)
-							tempDisk.Mbr_partitions[0].Part_start = size.SizeMBR() + 1
-							temp_p.Part_start = size.SizeMBR() + 1
+							tempDisk.Mbr_partitions[0].Part_start = size.SizeMBR()
+							temp_p.Part_start = size.SizeMBR()
 						}
 					} else {
 						numero_e = 1
 						menor_size = int(tempDisk.Mbr_partitions[0].Part_s)
-						tempDisk.Mbr_partitions[0].Part_start = size.SizeMBR() + 1
-						temp_p.Part_start = size.SizeMBR() + 1
+						tempDisk.Mbr_partitions[0].Part_start = size.SizeMBR()
+						temp_p.Part_start = size.SizeMBR()
 					}
 				}
 			}
@@ -220,14 +223,14 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 						if tempDisk.Mbr_partitions[1].Part_s < int32(menor_size) {
 							numero_e = 1
 							menor_size = int(tempDisk.Mbr_partitions[1].Part_s)
-							tempDisk.Mbr_partitions[1].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
-							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
+							tempDisk.Mbr_partitions[1].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s
+							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s
 						}
 					} else {
 						numero_e = 1
 						menor_size = int(tempDisk.Mbr_partitions[1].Part_s)
-						tempDisk.Mbr_partitions[1].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
-						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
+						tempDisk.Mbr_partitions[1].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s
 					}
 				}
 			}
@@ -237,14 +240,14 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 						if tempDisk.Mbr_partitions[2].Part_s < int32(menor_size) {
 							numero_e = 1
 							menor_size = int(tempDisk.Mbr_partitions[2].Part_s)
-							tempDisk.Mbr_partitions[2].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
-							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+							tempDisk.Mbr_partitions[2].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s
+							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s
 						}
 					} else {
 						numero_e = 1
 						menor_size = int(tempDisk.Mbr_partitions[2].Part_s)
-						tempDisk.Mbr_partitions[2].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
-						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+						tempDisk.Mbr_partitions[2].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s
 					}
 				}
 			}
@@ -254,14 +257,14 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 						if tempDisk.Mbr_partitions[3].Part_s < int32(menor_size) {
 							numero_e = 1
 							//menor_size = int(tempDisk.Mbr_partitions[3].Part_s)
-							tempDisk.Mbr_partitions[3].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
-							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+							tempDisk.Mbr_partitions[3].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s
+							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s
 						}
 					} else {
 						numero_e = 1
 						//menor_size = int(tempDisk.Mbr_partitions[3].Part_s)
-						tempDisk.Mbr_partitions[3].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
-						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+						tempDisk.Mbr_partitions[3].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s
 					}
 				}
 			}
@@ -287,7 +290,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 					if numero_e == 0 {
 						numero_e = 1
 						//menor_size = int(tempDisk.Mbr_partitions[0].Part_s)
-						temp_p.Part_start = size.SizeMBR() + 1
+						temp_p.Part_start = size.SizeMBR()
 					}
 				}
 			}
@@ -296,7 +299,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 					if numero_e == 0 {
 						numero_e = 1
 						//menor_size = int(tempDisk.Mbr_partitions[1].Part_s)
-						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s
 					}
 				}
 			}
@@ -305,7 +308,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 					if numero_e == 0 {
 						numero_e = 1
 						//menor_size = int(tempDisk.Mbr_partitions[2].Part_s)
-						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s
 					}
 				}
 			}
@@ -314,7 +317,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 					if numero_e == 0 {
 						numero_e = 1
 						//menor_size = int(tempDisk.Mbr_partitions[3].Part_s)
-						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s
 					}
 				}
 			}
@@ -342,12 +345,12 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 						if tempDisk.Mbr_partitions[0].Part_s > int32(menor_size) {
 							numero_e = 1
 							menor_size = int(tempDisk.Mbr_partitions[0].Part_s)
-							temp_p.Part_start = size.SizeMBR() + 1
+							temp_p.Part_start = size.SizeMBR()
 						}
 					} else {
 						numero_e = 1
 						menor_size = int(tempDisk.Mbr_partitions[0].Part_s)
-						temp_p.Part_start = size.SizeMBR() + 1
+						temp_p.Part_start = size.SizeMBR()
 					}
 				}
 			}
@@ -357,12 +360,12 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 						if tempDisk.Mbr_partitions[1].Part_s > int32(menor_size) {
 							numero_e = 1
 							menor_size = int(tempDisk.Mbr_partitions[1].Part_s)
-							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
+							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s
 						}
 					} else {
 						numero_e = 1
 						menor_size = int(tempDisk.Mbr_partitions[1].Part_s)
-						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s
 					}
 				}
 			}
@@ -372,12 +375,12 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 						if tempDisk.Mbr_partitions[2].Part_s > int32(menor_size) {
 							numero_e = 1
 							menor_size = int(tempDisk.Mbr_partitions[2].Part_s)
-							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s
 						}
 					} else {
 						numero_e = 1
 						menor_size = int(tempDisk.Mbr_partitions[2].Part_s)
-						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s
 					}
 				}
 			}
@@ -387,12 +390,12 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 						if tempDisk.Mbr_partitions[3].Part_s > int32(menor_size) {
 							numero_e = 1
 							//menor_size = int(tempDisk.Mbr_partitions[3].Part_s)
-							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s
 						}
 					} else {
 						numero_e = 1
 						//menor_size = int(tempDisk.Mbr_partitions[3].Part_s)
-						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s
 					}
 				}
 			}
@@ -402,27 +405,40 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 			}
 		}
 	} else {
+		fmt.Println("\t\t\t\t\tPartición Lógica", string(_name))
 		//particion logica que se guarda
-		if tempDisk.Mbr_partitions[0].Part_name == [16]byte(_name) || tempDisk.Mbr_partitions[1].Part_name == [16]byte(_name) || tempDisk.Mbr_partitions[2].Part_name == [16]byte(_name) || tempDisk.Mbr_partitions[3].Part_name == [16]byte(_name) {
+		if string(tempDisk.Mbr_partitions[0].Part_name[:]) == string(_name) || string(tempDisk.Mbr_partitions[1].Part_name[:]) == string(_name) || string(tempDisk.Mbr_partitions[2].Part_name[:]) == string(_name) || string(tempDisk.Mbr_partitions[3].Part_name[:]) == string(_name) {
 			color.Red("Particion existente")
 			return
 		}
+		//println("Seguimos")
 		particion_ext := PartitionVacia()
 		if tempDisk.Mbr_partitions[0].Part_type == 'E' {
+			//fmt.Println("primero")
 			particion_ext = tempDisk.Mbr_partitions[0]
 		} else if tempDisk.Mbr_partitions[1].Part_type == 'E' {
 			particion_ext = tempDisk.Mbr_partitions[1]
+			//fmt.Println("segundo")
 		} else if tempDisk.Mbr_partitions[2].Part_type == 'E' {
 			particion_ext = tempDisk.Mbr_partitions[2]
+			//fmt.Println("tercero")
 		} else if tempDisk.Mbr_partitions[3].Part_type == 'E' {
 			particion_ext = tempDisk.Mbr_partitions[3]
+			//fmt.Println("cuarto")
 		} else {
 			color.Red("No se puede crear particion logica ya que no existe particion extendida")
 			return
 		}
-
-		ebr_inicio := particion_ext.Part_s
+		//fmt.Println("siguiendo")
+		ebr_inicio := particion_ext.Part_start
+		//fmt.Println("inicio", ebr_inicio)
 		ebr_anterior := structures.EBR{}
+		ebr_anterior.Part_mount = int8(-1)
+		ebr_anterior.Part_fit = _fit
+		ebr_anterior.Part_start = int32(-1)
+		ebr_anterior.Part_s = int32(-1)
+		ebr_anterior.Part_next = int32(-1)
+		ebr_anterior.Name = DevolverNombreByte("-1")
 		inicio_ebr_anterior := int32(0)
 		size_particion_actual := int32(0)
 		inicio_particion_guardar := int32(0)
@@ -432,12 +448,19 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 			if ebr_inicio == int32(-1) {
 				break
 			}
+			//fmt.Println("Obtener")
 			ebr_actual, err := Obtener_EBR(path, ebr_inicio)
+			//fmt.Println(ebr_actual)
 			if err != nil {
+				return
+			}
+			if ebr_actual.Name == ebr.Name {
+				color.Yellow("Nombre de EBR igual")
 				return
 			}
 			if particion_ext.Part_fit == 'B' {
 				//Best Fit
+				//fmt.Println("Best")
 				if ebr_actual.Part_mount == int8(-1) {
 					if temp_p.Part_s < ebr_actual.Part_s {
 						if size_particion_actual == 0 {
@@ -453,6 +476,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 				}
 			} else if particion_ext.Part_fit == 'F' {
 				//First
+				//fmt.Println("First")
 				if ebr_actual.Part_mount == -1 {
 					if temp_p.Part_s < ebr_actual.Part_s {
 						size_particion_actual = ebr_actual.Part_s
@@ -461,6 +485,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 					}
 				}
 			} else if particion_ext.Part_fit == 'W' {
+				//fmt.Println("Worst")
 				if ebr_actual.Part_mount == int8(-1) {
 					if temp_p.Part_s < ebr_actual.Part_s {
 						if size_particion_actual == 0 {
@@ -477,6 +502,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 			}
 			if size_particion_actual == 0 && inicio_particion_guardar == 0 && ebr_actual.Part_next == -1 {
 				if contador == 0 && ebr_actual.Part_mount == -1 {
+					//fmt.Println("vamos")
 					//modificar ebr
 					inicio_particion_guardar = ebr_inicio
 					if (ebr.Part_s + inicio_particion_guardar) > (particion_ext.Part_start + particion_ext.Part_s) {
@@ -493,16 +519,19 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 					inicio_ebr_anterior = ebr_inicio
 				}
 			}
+			ebr_inicio = ebr_actual.Part_next
+			contador++
 		}
 		total_size := size.SizeEBR()
 		ebr.Part_start = inicio_particion_guardar + total_size
 		ebr.Part_next = int32(siguiente)
 		GuardarEBR(path, ebr, inicio_particion_guardar)
+		color.Green("EBR grabado")
 		///modificar siguiente anterior
 		if inicio_ebr_anterior != 0 {
-			//ebr_actual.Part_next := inicio_particion_guardar
+			ebr_anterior.Part_next = inicio_particion_guardar
 			GuardarEBR(path, ebr_anterior, inicio_ebr_anterior)
-			color.Green("Partición logica creada")
+			color.Green("EBR anterior modificado")
 		}
 	}
 }

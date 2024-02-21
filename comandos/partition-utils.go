@@ -10,10 +10,13 @@ import (
 	"github.com/fatih/color"
 )
 
-func ExisteExtendida(disk structures.MBR) bool {
-	if disk.Mbr_partitions[0].Part_type == 'E' || disk.Mbr_partitions[1].Part_type == 'E' || disk.Mbr_partitions[2].Part_type == 'E' || disk.Mbr_partitions[3].Part_type == 'E' {
-		color.Yellow("[FDISK]: Particion Extendida existente")
-		return true
+func ExisteExtendida(disk structures.MBR, tipe byte) bool {
+	for i := range disk.Mbr_partitions {
+		if (disk.Mbr_partitions[i].Part_type == 'E') && (tipe == 'E') {
+			//fmt.Println("si")
+			return true
+		}
+		//fmt.Println(i, string(tipe))
 	}
 	return false
 }
@@ -110,7 +113,7 @@ func Escribir_Particion(path string, particion structures.Partition, posicion in
 		color.Red("[FDISK]: No se pudo escribir en el archivo la Particion")
 		return
 	}
-	color.Cyan("[FDISK]: :D")
+	//color.Cyan("[FDISK]: :D")
 } //Escribir EBR Particion//-
 
 // Guardar EBR
@@ -125,12 +128,12 @@ func GuardarEBR(path string, ebr structures.EBR, position int32) {
 		color.Red("[FDISK]: No se pudo mover el puntero")
 		return
 	}
-	fmt.Println(ebr)
+	//fmt.Println(ebr)
 	if err := binary.Write(file, binary.LittleEndian, &ebr); err != nil {
 		color.Red("[FDISK]: No se pudo sobreescribir EBR")
 		return
 	}
-	color.Cyan("[FDISK]: :D")
+	//color.Cyan("[FDISK]: :D")
 }
 
 // ------------VACIAR PARTICION------------
@@ -151,7 +154,7 @@ func VaciarParticion(path string, inicio int32, size int32) {
 			return
 		}
 	}
-	color.Cyan("[FDISK]: :3")
+	//color.Cyan("[FDISK]: :3")
 }
 
 // Obtener EBR
@@ -248,39 +251,39 @@ func DeletePartitionFull(path string, disk structures.MBR, name string) {
 			ebr_inicio = ebr_actual.Part_next
 			continue
 		}
-		//En el caso de ser primaraia o extendida
-		if variableu != 0 || valores != 0 {
-			fmt.Println("Primario o Extendido")
-			particion.Part_status = -1
-			particion.Part_name = DevolverNombreByte("-1")
-			if numero == 1 {
-				disk.Mbr_partitions[0] = particion
-				GuardarParticion(path, disk)
-				VaciarParticion(path, particion.Part_start, particion.Part_s)
-				color.Green("Particion 0 Eliminada")
-			}
-			if numero == 2 {
-				disk.Mbr_partitions[1] = particion
-				GuardarParticion(path, disk)
-				VaciarParticion(path, particion.Part_start, particion.Part_s)
-				color.Green("Particion 1 Eliminada")
-			}
-			if numero == 3 {
-				disk.Mbr_partitions[2] = particion
-				GuardarParticion(path, disk)
-				VaciarParticion(path, particion.Part_start, particion.Part_s)
-				color.Green("Particion 2 Eliminada")
-			}
-			if numero == 4 {
-				disk.Mbr_partitions[3] = particion
-				GuardarParticion(path, disk)
-				VaciarParticion(path, particion.Part_start, particion.Part_s)
-				color.Green("Particion 3 Eliminada")
-			}
-		} else {
-			color.Red("No se pudo encontrar la partición")
-			return
+	}
+	//En el caso de ser primaraia o extendida
+	if variableu != 0 || valores != 0 {
+		fmt.Println("Primario o Extendido")
+		particion.Part_status = -1
+		particion.Part_name = DevolverNombreByte("-1")
+		if numero == 1 {
+			disk.Mbr_partitions[0] = particion
+			GuardarParticion(path, disk)
+			VaciarParticion(path, particion.Part_start, particion.Part_s)
+			color.Green("Particion 0 Eliminada")
 		}
+		if numero == 2 {
+			disk.Mbr_partitions[1] = particion
+			GuardarParticion(path, disk)
+			VaciarParticion(path, particion.Part_start, particion.Part_s)
+			color.Green("Particion 1 Eliminada")
+		}
+		if numero == 3 {
+			disk.Mbr_partitions[2] = particion
+			GuardarParticion(path, disk)
+			VaciarParticion(path, particion.Part_start, particion.Part_s)
+			color.Green("Particion 2 Eliminada")
+		}
+		if numero == 4 {
+			disk.Mbr_partitions[3] = particion
+			GuardarParticion(path, disk)
+			VaciarParticion(path, particion.Part_start, particion.Part_s)
+			color.Green("Particion 3 Eliminada")
+		}
+	} else {
+		color.Red("No se pudo encontrar la partición")
+		return
 	}
 }
 

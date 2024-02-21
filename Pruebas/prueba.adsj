@@ -1,17 +1,21 @@
 # execute -path=/home/iskandar/Escritorio/Proyectos/Git/MIA_1S2024_201906051/Proyectos/MIA_P1_201906051/Pruebas/prueba.adsj
 # execute -path=Pruebas/prueba.adsj
 
-MKdisK -Size=3000 -unit=k -fit=bF
+MKdisK -Size=10 -unit=M -fit=bF
 #mKdISk
 #corre que te corre con size -name=asdf
        #mkdisk -size="13" -unit=m -fit=bF #esto es el comentario
                 #esto otro tambien lo ignora
-Fdisk -name="Part1" -driveletter=A -size=2 -type=P #-delete=FULL
 fdisk -name=Parte2 -driveletter=A -size=4 -unit=M -type=E
-fdisk -name=UWU -driveletter=B -size=8
-fdisk -driveletter=A -size=45 -unit=K -type=E
-fdisk -driveletter=F -type=P -size=4 -name=Fukka
-fdisk -driveletter=C -size=12 -name=asdf
-fdisk -size=3 -name=Fukanzema -driveletter=A
+Fdisk -name="Part1" -driveletter=A -size=2 -type=P  #-delete=FULL
+#fdisk -name=UWU -driveletter=A -size=8
+fdisk -driveletter=A -size=2 -unit=M -type=E
+#fdisk -driveletter=A -type=P -size=4 -name=Fukka
+fdisk -driveletter=A -size=12 -name=asdf -type=L
+fdisk -driveletter=A -size=12 -name=asdf -type=L
+fdisk -driveletter=A -size=450 -unit=k -name=donce -type=L
 
-rep -driveletter=A
+
+
+
+#rep -driveletter=A

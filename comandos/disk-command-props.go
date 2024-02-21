@@ -26,14 +26,18 @@ func DiskCommandProps(command string, instructions []string) {
 	if strings.ToUpper(command) == "MKDISK" {
 		_size, _fit, _unit = Values_MKDISK(instructions)
 		if _size <= 0 || _fit == '0' || _unit == '0' {
-			color.Yellow("[MKDISK]: Error to asign values")
+			color.Yellow("[MKDISK]: Error to asign values for '" + string(_name[:]) + "'")
 		} else {
 			MKDISK_Create(_size, _fit, _unit)
 		}
 	} else if strings.ToUpper(command) == "FDISK" {
 		_size, _driveletter, _name, _unit, _type, _fit, _delete, _add = Values_FDISK(instructions)
 		if _size <= 0 || ToString(_name[:]) == "" || _driveletter == '0' {
-			color.Yellow("[FDISK]: Error to asign values")
+			if ToString(_name[:]) == "" {
+				color.Yellow("[FDISK]: Error to asign values for (unamed) disk")
+			} else {
+				color.Yellow("[FDISK]: Error to asign values for disk '" + string(_name[:]) + "'")
+			}
 		} else {
 			FDISK_Create(_size, _driveletter, _name[:], _unit, _type, _fit, _delete, _add)
 		}
