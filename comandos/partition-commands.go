@@ -3,7 +3,6 @@ package comandos
 import (
 	"MIA_P1_201906051/size"
 	"MIA_P1_201906051/structures"
-	"fmt"
 	"strings"
 
 	"github.com/fatih/color"
@@ -72,12 +71,12 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 
 	//fmt.Println(_name)
 	if _delete == "FULL" {
-		DeletePartitionFull(path, _add, _unit, tempDisk, string(_name))
+		DeletePartitionFull(path, tempDisk, string(_name))
 		return
 	}
 	//fmt.Println("Salto delete")
 	if _add != 0 && _unit != '0' {
-		fmt.Println("Dentro del add")
+		AddInPartition(path, _add, _unit, tempDisk, string(_name))
 		return
 	}
 
