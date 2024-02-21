@@ -186,6 +186,323 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 			return
 		}
 		//Caso en el que ya se pudo haber borrado un disco
+		color.Yellow("Ya se ha borrado una particion")
+		if string(tempDisk.Mbr_partitions[0].Part_name[:]) == string(_name) || string(tempDisk.Mbr_partitions[1].Part_name[:]) == string(_name) || string(tempDisk.Mbr_partitions[2].Part_name[:]) == string(_name) || string(tempDisk.Mbr_partitions[3].Part_name[:]) == string(_name) {
+			color.Red("Nombre de partición ya existente")
+			return
+		}
+		if tempDisk.Dsk_fit == 'B' {
+			//se leen las 4 particiones
+			//se selecciona el menor tamaño a ajustar
+			//Best Fit
+			menor_size := 0
+			numero_e := 0
+			if tempDisk.Mbr_partitions[0].Part_status == int8(-1) {
+				if tempDisk.Mbr_partitions[0].Part_s > temp_p.Part_s {
+					if numero_e != 0 {
+						if tempDisk.Mbr_partitions[0].Part_s < int32(menor_size) {
+							numero_e = 1
+							menor_size = int(tempDisk.Mbr_partitions[0].Part_s)
+							tempDisk.Mbr_partitions[0].Part_start = size.SizeMBR() + 1
+							temp_p.Part_start = size.SizeMBR() + 1
+						}
+					} else {
+						numero_e = 1
+						menor_size = int(tempDisk.Mbr_partitions[0].Part_s)
+						tempDisk.Mbr_partitions[0].Part_start = size.SizeMBR() + 1
+						temp_p.Part_start = size.SizeMBR() + 1
+					}
+				}
+			}
+			if tempDisk.Mbr_partitions[1].Part_status == int8(-1) {
+				if tempDisk.Mbr_partitions[1].Part_s > temp_p.Part_s {
+					if numero_e != 0 {
+						if tempDisk.Mbr_partitions[1].Part_s < int32(menor_size) {
+							numero_e = 1
+							menor_size = int(tempDisk.Mbr_partitions[1].Part_s)
+							tempDisk.Mbr_partitions[1].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
+							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
+						}
+					} else {
+						numero_e = 1
+						menor_size = int(tempDisk.Mbr_partitions[1].Part_s)
+						tempDisk.Mbr_partitions[1].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
+					}
+				}
+			}
+			if tempDisk.Mbr_partitions[2].Part_status == int8(-1) {
+				if tempDisk.Mbr_partitions[2].Part_s > temp_p.Part_s {
+					if numero_e != 0 {
+						if tempDisk.Mbr_partitions[2].Part_s < int32(menor_size) {
+							numero_e = 1
+							menor_size = int(tempDisk.Mbr_partitions[2].Part_s)
+							tempDisk.Mbr_partitions[2].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+						}
+					} else {
+						numero_e = 1
+						menor_size = int(tempDisk.Mbr_partitions[2].Part_s)
+						tempDisk.Mbr_partitions[2].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+					}
+				}
+			}
+			if tempDisk.Mbr_partitions[3].Part_status == int8(-1) {
+				if tempDisk.Mbr_partitions[3].Part_s > temp_p.Part_s {
+					if numero_e != 0 {
+						if tempDisk.Mbr_partitions[3].Part_s < int32(menor_size) {
+							numero_e = 1
+							//menor_size = int(tempDisk.Mbr_partitions[3].Part_s)
+							tempDisk.Mbr_partitions[3].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+						}
+					} else {
+						numero_e = 1
+						//menor_size = int(tempDisk.Mbr_partitions[3].Part_s)
+						tempDisk.Mbr_partitions[3].Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+					}
+				}
+			}
+			//guardar particion
+			if numero_e != 0 {
+				GuardarParticionV2(path, temp_p, int32(numero_e))
+				if temp_p.Part_type == 'E' {
+					ebr.Part_mount = int8(-1)
+					ebr.Part_fit = _fit
+					ebr.Part_start = int32(-1)
+					ebr.Part_s = int32(-1)
+					ebr.Part_next = int32(-1)
+					ebr.Name = DevolverNombreByte("-1")
+					Escribir_EBR(path, ebr, temp_p.Part_start)
+				}
+			}
+		} else if tempDisk.Dsk_fit == 'F' {
+			//First Fit
+			numero_e := 0
+			//menor_size := 0
+			if tempDisk.Mbr_partitions[0].Part_status == int8(-1) {
+				if tempDisk.Mbr_partitions[0].Part_s > temp_p.Part_s {
+					if numero_e == 0 {
+						numero_e = 1
+						//menor_size = int(tempDisk.Mbr_partitions[0].Part_s)
+						temp_p.Part_start = size.SizeMBR() + 1
+					}
+				}
+			}
+			if tempDisk.Mbr_partitions[1].Part_status == int8(-1) {
+				if tempDisk.Mbr_partitions[1].Part_s > temp_p.Part_s {
+					if numero_e == 0 {
+						numero_e = 1
+						//menor_size = int(tempDisk.Mbr_partitions[1].Part_s)
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
+					}
+				}
+			}
+			if tempDisk.Mbr_partitions[2].Part_status == int8(-1) {
+				if tempDisk.Mbr_partitions[2].Part_s > temp_p.Part_s {
+					if numero_e == 0 {
+						numero_e = 1
+						//menor_size = int(tempDisk.Mbr_partitions[2].Part_s)
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+					}
+				}
+			}
+			if tempDisk.Mbr_partitions[3].Part_status == int8(-1) {
+				if tempDisk.Mbr_partitions[3].Part_s > temp_p.Part_s {
+					if numero_e == 0 {
+						numero_e = 1
+						//menor_size = int(tempDisk.Mbr_partitions[3].Part_s)
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+					}
+				}
+			}
+			if numero_e != 0 {
+				GuardarParticionV2(path, temp_p, int32(numero_e))
+				if temp_p.Part_type == 'E' {
+					ebr.Part_mount = int8(-1)
+					ebr.Part_fit = _fit
+					ebr.Part_start = int32(-1)
+					ebr.Part_s = int32(-1)
+					ebr.Part_next = int32(-1)
+					ebr.Name = DevolverNombreByte("-1")
+					Escribir_EBR(path, ebr, temp_p.Part_start)
+				}
+			}
+		} else if tempDisk.Dsk_fit == 'W' {
+			//Worst Fit
+			//Leer 4 particiones
+			//Seleccionar la de mayor tamaño
+			menor_size := 0
+			numero_e := 0
+			if tempDisk.Mbr_partitions[0].Part_status == int8(-1) {
+				if tempDisk.Mbr_partitions[0].Part_s > temp_p.Part_s {
+					if numero_e != 0 {
+						if tempDisk.Mbr_partitions[0].Part_s > int32(menor_size) {
+							numero_e = 1
+							menor_size = int(tempDisk.Mbr_partitions[0].Part_s)
+							temp_p.Part_start = size.SizeMBR() + 1
+						}
+					} else {
+						numero_e = 1
+						menor_size = int(tempDisk.Mbr_partitions[0].Part_s)
+						temp_p.Part_start = size.SizeMBR() + 1
+					}
+				}
+			}
+			if tempDisk.Mbr_partitions[1].Part_status == int8(-1) {
+				if tempDisk.Mbr_partitions[1].Part_s > temp_p.Part_s {
+					if numero_e != 0 {
+						if tempDisk.Mbr_partitions[1].Part_s > int32(menor_size) {
+							numero_e = 1
+							menor_size = int(tempDisk.Mbr_partitions[1].Part_s)
+							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
+						}
+					} else {
+						numero_e = 1
+						menor_size = int(tempDisk.Mbr_partitions[1].Part_s)
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + 1
+					}
+				}
+			}
+			if tempDisk.Mbr_partitions[2].Part_status == int8(-1) {
+				if tempDisk.Mbr_partitions[2].Part_s > temp_p.Part_s {
+					if numero_e != 0 {
+						if tempDisk.Mbr_partitions[2].Part_s > int32(menor_size) {
+							numero_e = 1
+							menor_size = int(tempDisk.Mbr_partitions[2].Part_s)
+							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+						}
+					} else {
+						numero_e = 1
+						menor_size = int(tempDisk.Mbr_partitions[2].Part_s)
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + 1
+					}
+				}
+			}
+			if tempDisk.Mbr_partitions[3].Part_status == int8(-1) {
+				if tempDisk.Mbr_partitions[3].Part_s > temp_p.Part_s {
+					if numero_e != 0 {
+						if tempDisk.Mbr_partitions[3].Part_s > int32(menor_size) {
+							numero_e = 1
+							//menor_size = int(tempDisk.Mbr_partitions[3].Part_s)
+							temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+						}
+					} else {
+						numero_e = 1
+						//menor_size = int(tempDisk.Mbr_partitions[3].Part_s)
+						temp_p.Part_start = size.SizeMBR() + tempDisk.Mbr_partitions[0].Part_s + tempDisk.Mbr_partitions[1].Part_s + tempDisk.Mbr_partitions[2].Part_s + 1
+					}
+				}
+			}
+			//Guardar particion
+			if numero_e != 0 {
+				GuardarParticionV2(path, temp_p, int32(numero_e))
+			}
+		}
+	} else {
+		//particion logica que se guarda
+		if tempDisk.Mbr_partitions[0].Part_name == [16]byte(_name) || tempDisk.Mbr_partitions[1].Part_name == [16]byte(_name) || tempDisk.Mbr_partitions[2].Part_name == [16]byte(_name) || tempDisk.Mbr_partitions[3].Part_name == [16]byte(_name) {
+			color.Red("Particion existente")
+			return
+		}
+		particion_ext := PartitionVacia()
+		if tempDisk.Mbr_partitions[0].Part_type == 'E' {
+			particion_ext = tempDisk.Mbr_partitions[0]
+		} else if tempDisk.Mbr_partitions[1].Part_type == 'E' {
+			particion_ext = tempDisk.Mbr_partitions[1]
+		} else if tempDisk.Mbr_partitions[2].Part_type == 'E' {
+			particion_ext = tempDisk.Mbr_partitions[2]
+		} else if tempDisk.Mbr_partitions[3].Part_type == 'E' {
+			particion_ext = tempDisk.Mbr_partitions[3]
+		} else {
+			color.Red("No se puede crear particion logica ya que no existe particion extendida")
+			return
+		}
 
+		ebr_inicio := particion_ext.Part_s
+		ebr_anterior := structures.EBR{}
+		inicio_ebr_anterior := int32(0)
+		size_particion_actual := int32(0)
+		inicio_particion_guardar := int32(0)
+		siguiente := -1
+		contador := 0
+		for {
+			if ebr_inicio == int32(-1) {
+				break
+			}
+			ebr_actual, err := Obtener_EBR(path, ebr_inicio)
+			if err != nil {
+				return
+			}
+			if particion_ext.Part_fit == 'B' {
+				//Best Fit
+				if ebr_actual.Part_mount == int8(-1) {
+					if temp_p.Part_s < ebr_actual.Part_s {
+						if size_particion_actual == 0 {
+							size_particion_actual = ebr_actual.Part_s
+							inicio_particion_guardar = ebr_inicio
+							siguiente = int(ebr_actual.Part_next)
+						} else if size_particion_actual < temp_p.Part_s {
+							size_particion_actual = ebr_actual.Part_s
+							inicio_particion_guardar = ebr_inicio
+							siguiente = int(ebr_actual.Part_next)
+						}
+					}
+				}
+			} else if particion_ext.Part_fit == 'F' {
+				//First
+				if ebr_actual.Part_mount == -1 {
+					if temp_p.Part_s < ebr_actual.Part_s {
+						size_particion_actual = ebr_actual.Part_s
+						inicio_particion_guardar = ebr_inicio
+						siguiente = int(ebr_actual.Part_next)
+					}
+				}
+			} else if particion_ext.Part_fit == 'W' {
+				if ebr_actual.Part_mount == int8(-1) {
+					if temp_p.Part_s < ebr_actual.Part_s {
+						if size_particion_actual == 0 {
+							size_particion_actual = ebr_actual.Part_s
+							inicio_particion_guardar = ebr_inicio
+							siguiente = int(ebr_actual.Part_next)
+						} else if size_particion_actual > temp_p.Part_s {
+							size_particion_actual = ebr_actual.Part_s
+							inicio_particion_guardar = ebr_inicio
+							siguiente = int(ebr_actual.Part_next)
+						}
+					}
+				}
+			}
+			if size_particion_actual == 0 && inicio_particion_guardar == 0 && ebr_actual.Part_next == -1 {
+				if contador == 0 && ebr_actual.Part_mount == -1 {
+					//modificar ebr
+					inicio_particion_guardar = ebr_inicio
+					if (ebr.Part_s + inicio_particion_guardar) > (particion_ext.Part_start + particion_ext.Part_s) {
+						color.Red("Error: No hay espacio en partición extendida")
+						return
+					}
+				} else {
+					inicio_particion_guardar = ebr_inicio + ebr_actual.Part_s
+					if (ebr.Part_s + inicio_particion_guardar) > (particion_ext.Part_start + particion_ext.Part_s) {
+						color.Red("Error: No hay espacio en partición extendida")
+						return
+					}
+					ebr_anterior = ebr_actual
+					inicio_ebr_anterior = ebr_inicio
+				}
+			}
+		}
+		total_size := size.SizeEBR()
+		ebr.Part_start = inicio_particion_guardar + total_size
+		ebr.Part_next = int32(siguiente)
+		GuardarEBR(path, ebr, inicio_particion_guardar)
+		///modificar siguiente anterior
+		if inicio_ebr_anterior != 0 {
+			//ebr_actual.Part_next := inicio_particion_guardar
+			GuardarEBR(path, ebr_anterior, inicio_ebr_anterior)
+			color.Green("Partición logica creada")
+		}
 	}
 }

@@ -442,7 +442,7 @@ func AddInPartition(path string, _add int32, _unit byte, disk structures.MBR, na
 		}
 	}
 	if !agrego {
-		if particion.Part_s+Tamano(_add, _unit) > 0 && (particion.Part_s+particion.Part_start+Tamano(_add, _unit) < inicio_siguiente) {
+		if (particion.Part_s+Tamano(_add, _unit) > 0) && (particion.Part_s+particion.Part_start+Tamano(_add, _unit) < inicio_siguiente) {
 			particion.Part_s = particion.Part_s + Tamano(_add, _unit)
 			GuardarParticionV2(path, particion, int32(numero))
 			color.Green("Espacio Modificado")
