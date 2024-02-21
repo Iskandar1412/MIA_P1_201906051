@@ -1,9 +1,7 @@
 package comandos
 
 import (
-	"MIA_P1_201906051/structures"
 	"bytes"
-	"encoding/binary"
 	"fmt"
 	"math/rand"
 	"os"
@@ -131,23 +129,6 @@ func IntFechaToStr(fecha int32) string {
 	fechaFormat := fech.Format(formato)
 	//fmt.Println(fechaFormat)
 	return fechaFormat
-}
-
-func PartitionVacia() structures.Partition {
-	var partition structures.Partition
-	partition.Part_status = int8(-1)
-	partition.Part_type = 'P'
-	partition.Part_fit = 'F'
-	partition.Part_start = -1
-	partition.Part_s = -1
-	for i := 0; i < len(partition.Part_name); i++ {
-		partition.Part_name[i] = '\x00'
-	}
-	partition.Part_correlative = -1
-	for i := 0; i < len(partition.Part_id); i++ {
-		partition.Part_id[i] = '\x00'
-	}
-	return partition
 }
 
 func ObDiskSignature() int32 {
@@ -349,51 +330,4 @@ func TieneCat(comando string, valor string) {
 		color.Red("[" + comando + "]: No tiene fileN o tiene un valor no valido")
 		return
 	}
-}
-
-func ExisteExtendida(disk structures.MBR) bool {
-	if disk.Mbr_partitions[0].Part_type == 'E' || disk.Mbr_partitions[1].Part_type == 'E' || disk.Mbr_partitions[2].Part_type == 'E' || disk.Mbr_partitions[3].Part_type == 'E' {
-		color.Yellow("[FDISK]: Particion Extendida existente")
-		return true
-	}
-	return false
-}
-
-// -------------Particiones-------------
-func GuardarParticion(path string, estructura structures.MBR) {
-	file, err := os.OpenFile(path, os.O_RDWR, 0666)
-	if err != nil {
-		color.Red("[FDISK]: No se pudo abrir el archivo")
-		return
-	}
-	defer file.Close()
-	if _, err := file.Seek(0, 0); err != nil {
-		color.Red("[FDISK]: No se pudo mover el puntero")
-		return
-	}
-
-	if err := binary.Write(file, binary.LittleEndian, &estructura); err != nil {
-		color.Red("[FDISK]: No se pudo escribir en el archivo")
-		return
-	}
-	color.Cyan("[FDISK]: :3")
-}
-
-func GrabarEBR(path string, ebr_data structures.EBR, start int32) {
-	file, err := os.OpenFile(path, os.O_RDWR, 0666)
-	if err != nil {
-		color.Red("[FDISK]: No se pudo abrir el archivo")
-		return
-	}
-	defer file.Close()
-	if _, err := file.Seek(int64(start), 0); err != nil {
-		color.Red("[FDISK]: No se pudo mover el puntero")
-		return
-	}
-	fmt.Println(ebr_data)
-	if err := binary.Write(file, binary.LittleEndian, &ebr_data); err != nil {
-		color.Red("[FDISK]: No se pudo escribir en el archivo")
-		return
-	}
-	color.Cyan("[FDISK]: :D")
 }

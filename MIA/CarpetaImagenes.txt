@@ -1,7 +1,0 @@
-Proyecto 1 Manejo e Implementación de Archivos A
-
-Carpeta de Imagenes
-
-Para usar colores para imprimirlos (poner en consola): "go get -u github.com/fatih/color"
-
-		Created by Iskandar
