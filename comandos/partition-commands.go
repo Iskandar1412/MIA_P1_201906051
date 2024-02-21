@@ -62,9 +62,17 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 		color.Yellow("[FDISK] Cancel the operation because not yet a file")
 		return
 	}
+
+	//obtener disco
+	tempDisk, existe := ObtainMBRDisk(path)
+	if !existe {
+		color.Red("[FDISK]: Error al obtener el disco")
+		return
+	}
+
 	//fmt.Println(_name)
-	if _delete == "FULL" && string(_name) != "" {
-		fmt.Println("Dentro del delete")
+	if _delete == "FULL" {
+		DeletePartitionFull(path, _add, _unit, tempDisk, string(_name))
 		return
 	}
 	//fmt.Println("Salto delete")
@@ -73,12 +81,6 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 		return
 	}
 
-	//obtener disco
-	tempDisk, existe := ObtainMBRDisk(path)
-	if !existe {
-		color.Red("[FDISK]: Error al obtener el disco")
-		return
-	}
 	//Verificar si existe partición extendida
 	if ExisteExtendida(tempDisk) {
 		color.Magenta("[FDISK]: Ya hay una partición extendida")
@@ -178,7 +180,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 				ebr.Part_s = int32(-1)
 				ebr.Part_next = int32(-1)
 				ebr.Name = DevolverNombreByte("-1")
-				GrabarEBR(path, ebr, temp_p.Part_start)
+				Escribir_EBR(path, ebr, temp_p.Part_start)
 				color.Blue("[FDISK]: EBR grabado Exitosamente")
 			}
 			//fmt.Println(ebr)
