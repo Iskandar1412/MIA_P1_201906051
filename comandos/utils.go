@@ -3,8 +3,11 @@ package comandos
 import (
 	"MIA_P1_201906051/structures"
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"math/rand"
+	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -26,7 +29,15 @@ func ToString(b []byte) string {
 	return string(b[:nullIndex])
 }
 
-func TieneSize(comando string, size string) int64 {
+func ExisteArchivo(comando string, archivo string) bool {
+	if _, err := os.Stat(archivo); os.IsNotExist(err) {
+		color.Red("[" + comando + "]: Archivo No Encontrado")
+		return false
+	}
+	return true
+}
+
+func TieneSize(comando string, size string) int32 {
 	valsize := TieneEntero(size)
 	if valsize <= 0 {
 		color.Red("[" + comando + "]: No tiene Size o tiene un valor no valido")
@@ -48,11 +59,11 @@ func TieneFit(comando string, fit string) byte {
 	//fmt.Println(val)
 	//fmt.Println([]byte(value[1]))
 	//fmt.Println(string(val))
-	if strings.ToUpper(value[1]) == "BF" {
+	if strings.ToUpper(value[1]) == "BF" || strings.ToUpper(value[1]) == "B" {
 		return 'B'
-	} else if strings.ToUpper(value[1]) == "FF" {
+	} else if strings.ToUpper(value[1]) == "FF" || strings.ToUpper(value[1]) == "F" {
 		return 'F'
-	} else if strings.ToUpper(value[1]) == "WF" {
+	} else if strings.ToUpper(value[1]) == "WF" || strings.ToUpper(value[1]) == "W" {
 		return 'W'
 	} else {
 		color.Yellow("[" + comando + "]: No tiene Fit Valido")
@@ -90,7 +101,7 @@ func TieneUnit(command string, unit string) byte {
 	}
 }
 
-func TieneEntero(valor string) int64 {
+func TieneEntero(valor string) int32 {
 	if !strings.HasPrefix(strings.ToLower(valor), "size=") {
 		return 0
 	}
@@ -103,19 +114,20 @@ func TieneEntero(valor string) int64 {
 		fmt.Println("Error conversion", err)
 		return 0
 	}
-	return int64(i)
+	return int32(i)
 }
 
-func ObFechaInt() int64 {
+func ObFechaInt() int32 {
 	fecha := time.Now()
 	timestamp := fecha.Unix()
 	//fmt.Println(timestamp)
-	return int64(timestamp)
+	return int32(timestamp)
 }
 
-func IntFechaToStr(fecha int64) string {
-	formato := "2006-01-02 - 15:04:05"
-	fech := time.Unix(fecha, 0)
+func IntFechaToStr(fecha int32) string {
+	conversion := int64(fecha)
+	formato := "2006/01/02 (15:04:05)"
+	fech := time.Unix(conversion, 0)
 	fechaFormat := fech.Format(formato)
 	//fmt.Println(fechaFormat)
 	return fechaFormat
@@ -123,7 +135,7 @@ func IntFechaToStr(fecha int64) string {
 
 func PartitionVacia() structures.Partition {
 	var partition structures.Partition
-	partition.Part_status = '\x00'
+	partition.Part_status = int8(-1)
 	partition.Part_type = 'P'
 	partition.Part_fit = 'F'
 	partition.Part_start = -1
@@ -138,15 +150,15 @@ func PartitionVacia() structures.Partition {
 	return partition
 }
 
-func ObDiskSignature() int64 {
+func ObDiskSignature() int32 {
 	source := rand.NewSource(time.Now().UnixNano())
 	numberR := rand.New(source)
 	signature := numberR.Intn(1000000) + 1
 	//fmt.Println(signature)
-	return int64(signature)
+	return int32(signature)
 }
 
-func Tamano(size int64, unit byte) int64 {
+func Tamano(size int32, unit byte) int32 {
 	if unit == 'B' {
 		return size
 	} else if unit == 'K' {
@@ -159,6 +171,9 @@ func Tamano(size int64, unit byte) int64 {
 }
 
 func Type_FDISK(_type string) byte {
+	if !strings.HasPrefix(strings.ToLower(_type), "type=") {
+		return '0'
+	}
 	value := strings.Split(_type, "=")
 	if len(value) < 2 {
 		color.Red("[FDISK]: No tiene Type Especificado")
@@ -185,9 +200,9 @@ func Type_MKFS(_type string) string {
 	}
 }
 
-func TieneDriveDeLetter(comando string, deletter string) byte {
-	if !strings.HasPrefix(strings.ToLower(deletter), "drivedeletter=") {
-		color.Red("[" + comando + "]: No tiene deletter o tiene un valor no valido")
+func TieneDriveLetter(comando string, deletter string) byte {
+	if !strings.HasPrefix(strings.ToLower(deletter), "driveletter=") {
+		color.Red("[" + comando + "]: No tiene driveletter o tiene un valor no valido")
 		return '0'
 	}
 	value := strings.Split(deletter, "=")
@@ -197,11 +212,188 @@ func TieneDriveDeLetter(comando string, deletter string) byte {
 	} else {
 		valor := []byte(value[1])
 		if len(valor) > 1 || len(valor) < 1 {
-			color.Red("[" + comando + "]: No tiene drivedeletter Valido")
+			color.Red("[" + comando + "]: No tiene driveletter Valido")
 			fmt.Println(string(valor))
 			return '0'
 		} else {
 			return valor[0]
 		}
 	}
+}
+
+func TieneNombre(comando string, valor string) string {
+	//fmt.Println("Valor ingresado:", valor)
+	if !strings.HasPrefix(strings.ToLower(valor), "name=") {
+		color.Red("[" + comando + "]: No tiene name o tiene un valor no valido")
+		return ""
+	}
+	value := strings.Split(valor, "=")
+	if len(value) < 2 {
+		color.Red("[" + comando + "]: No tiene name Valido")
+		return ""
+	} else {
+		return value[1]
+	}
+}
+
+func DevolverNombreByte(value string) [16]byte {
+	padText := make([]byte, 16)
+	for i := range padText {
+		padText[i] = '\x00'
+	}
+	copy(padText[:], []byte(value))
+	return [16]byte(padText)
+}
+
+func TieneTypeFDISK(valor string) byte {
+	if !strings.HasPrefix(strings.ToLower(valor), "type=") {
+		return '0'
+	}
+	value := strings.Split(valor, "=")
+	if len(value) < 2 {
+		color.Red("[FDISK]: No tiene Type Especificado")
+		return '0'
+	}
+	if strings.ToUpper(value[1]) == "P" {
+		return 'P'
+	} else if strings.ToUpper(value[1]) == "E" {
+		return 'E'
+	} else if strings.ToUpper(value[1]) == "L" {
+		return 'L'
+	} else {
+		color.Red("[FDISK]: No reconocido Type")
+		return '0'
+	}
+}
+
+func TieneDelete(valor string) string {
+	if !strings.HasPrefix(strings.ToLower(valor), "delete=") {
+		color.Red("[FDISK]: No tiene Delete Especificado")
+		return ""
+	}
+	value := strings.Split(valor, "=")
+	if len(value) < 2 {
+		color.Red("[FDISK]: No tiene Delete Especificado")
+		return ""
+	}
+	if !(strings.ToUpper(value[1]) == "FULL") {
+		color.Red("[FDISK]: No tiene Delete valido")
+		return ""
+	}
+	return "FULL"
+}
+
+func TieneAdd(valor string) int32 {
+	if !strings.HasPrefix(strings.ToLower(valor), "add=") {
+		return 0
+	}
+	value := strings.Split(valor, "=")
+	if len(value) < 2 {
+		return 0
+	}
+	num, err := strconv.Atoi(value[1])
+	if err != nil {
+		color.Red("[FDISK]: valor Add no aceptado")
+		return 0
+	}
+	return int32(num)
+}
+
+func TieneID(comando string, valor string) {
+	if !strings.HasPrefix(strings.ToLower(valor), "id=") {
+		color.Red("[" + comando + "]: No tiene id o tiene un valor no valido")
+		return
+	}
+}
+
+func TieneUser(comando string, valor string) {
+	if !strings.HasPrefix(strings.ToLower(valor), "user=") {
+		color.Red("[" + comando + "]: No tiene user o tiene un valor no valido")
+		return
+	}
+}
+
+func TienePassword(comando string, valor string) {
+	if !strings.HasPrefix(strings.ToLower(valor), "pass=") {
+		color.Red("[" + comando + "]: No tiene password o tiene un valor no valido")
+		return
+	}
+
+}
+
+func TieneGRP(comando string, valor string) {
+	if !strings.HasPrefix(strings.ToLower(valor), "grp=") {
+		color.Red("[" + comando + "]: No tiene grp o tiene un valor no valido")
+		return
+	}
+
+}
+
+func TientPath(comando string, valor string) {
+	if !strings.HasPrefix(strings.ToLower(valor), "path=") {
+		color.Red("[" + comando + "]: No tiene path o tiene un valor no valido")
+		return
+	}
+}
+
+func TieneCont(comando string, valor string) {
+	if !strings.HasPrefix(strings.ToLower(valor), "cont=") {
+		color.Red("[" + comando + "]: No tiene cont o tiene un valor no valido")
+		return
+	}
+}
+
+func TieneCat(comando string, valor string) {
+	re := regexp.MustCompile(`file\d+=`)
+	if !re.MatchString(valor) {
+		color.Red("[" + comando + "]: No tiene fileN o tiene un valor no valido")
+		return
+	}
+}
+
+func ExisteExtendida(disk structures.MBR) bool {
+	if disk.Mbr_partitions[0].Part_type == 'E' || disk.Mbr_partitions[1].Part_type == 'E' || disk.Mbr_partitions[2].Part_type == 'E' || disk.Mbr_partitions[3].Part_type == 'E' {
+		color.Yellow("[FDISK]: Particion Extendida existente")
+		return true
+	}
+	return false
+}
+
+// -------------Particiones-------------
+func GuardarParticion(path string, estructura structures.MBR) {
+	file, err := os.OpenFile(path, os.O_RDWR, 0666)
+	if err != nil {
+		color.Red("[FDISK]: No se pudo abrir el archivo")
+		return
+	}
+	defer file.Close()
+	if _, err := file.Seek(0, 0); err != nil {
+		color.Red("[FDISK]: No se pudo mover el puntero")
+		return
+	}
+
+	if err := binary.Write(file, binary.LittleEndian, &estructura); err != nil {
+		color.Red("[FDISK]: No se pudo escribir en el archivo")
+		return
+	}
+	color.Cyan("[FDISK]: :3")
+}
+
+func GrabarEBR(path string, ebr_data structures.EBR, start int32) {
+	file, err := os.OpenFile(path, os.O_RDWR, 0666)
+	if err != nil {
+		color.Red("[FDISK]: No se pudo abrir el archivo")
+		return
+	}
+	defer file.Close()
+	if _, err := file.Seek(int64(start), 0); err != nil {
+		color.Red("[FDISK]: No se pudo mover el puntero")
+		return
+	}
+	fmt.Println(ebr_data)
+	if err := binary.Write(file, binary.LittleEndian, &ebr_data); err != nil {
+		color.Red("[FDISK]: No se pudo escribir en el archivo")
+		return
+	}
+	color.Cyan("[FDISK]: :D")
 }

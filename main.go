@@ -13,8 +13,8 @@ import (
 
 // MIA_P1_201906051/structures
 // MIA_P1_201906051/size
-//execute -path=/home/iskandar/Escritorio/prueba.adsj
-
+// execute -path=/home/iskandar/Escritorio/prueba.adsj
+// execute -path=/home/iskandar/Escritorio/Proyectos/Git/MIA_1S2024_201906051/Proyectos/MIA_P1_201906051/Pruebas/prueba.adsj
 func main() {
 	color.Blue("PROY1 - 201906051 - Juan Urbina")
 	comandos.CrearCarpeta()

@@ -5,7 +5,7 @@ import (
 	"unsafe"
 )
 
-func SizeEBR() int64 {
+func SizeEBR() int32 { //30 bytes
 	a01 := unsafe.Sizeof(structures.EBR{}.Part_mount)
 	a02 := unsafe.Sizeof(structures.EBR{}.Part_fit)
 	a03 := unsafe.Sizeof(structures.EBR{}.Part_start)
@@ -13,10 +13,10 @@ func SizeEBR() int64 {
 	a05 := unsafe.Sizeof(structures.EBR{}.Part_next)
 	a06 := unsafe.Sizeof(structures.EBR{}.Name)
 	result := a01 + a02 + a03 + a04 + a05 + a06
-	return int64(result)
+	return int32(result)
 }
 
-func SizePartition() int64 {
+func SizePartition() int32 { //35 bytes
 	a01 := unsafe.Sizeof(structures.Partition{}.Part_status)
 	a02 := unsafe.Sizeof(structures.Partition{}.Part_type)
 	a03 := unsafe.Sizeof(structures.Partition{}.Part_fit)
@@ -26,15 +26,15 @@ func SizePartition() int64 {
 	a07 := unsafe.Sizeof(structures.Partition{}.Part_correlative)
 	a08 := unsafe.Sizeof(structures.Partition{}.Part_id)
 	result := a01 + a02 + a03 + a04 + a05 + a06 + a07 + a08
-	return int64(result)
+	return int32(result)
 }
 
-func SizeMBR() int64 {
+func SizeMBR() int32 { //153 bytes
 	a01 := unsafe.Sizeof(structures.MBR{}.Mbr_tamano)
 	a02 := unsafe.Sizeof(structures.MBR{}.Mbr_fecha_creacion)
 	a03 := unsafe.Sizeof(structures.MBR{}.Mbr_disk_signature)
 	a04 := unsafe.Sizeof(structures.MBR{}.Dsk_fit)
 	a05 := SizePartition() * 4
-	result := int64(a01+a02+a03+a04) + a05
+	result := int32(a01+a02+a03+a04) + a05
 	return result
 }

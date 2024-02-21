@@ -5,7 +5,7 @@ import (
 	"unsafe"
 )
 
-func SizeSuperBlock() int64 {
+func SizeSuperBlock() int32 { //68 bytes
 	a01 := unsafe.Sizeof(structures.SuperBlock{}.S_filesistem_type)
 	a02 := unsafe.Sizeof(structures.SuperBlock{}.S_inodes_count)
 	a03 := unsafe.Sizeof(structures.SuperBlock{}.S_blocks_count)
@@ -24,10 +24,10 @@ func SizeSuperBlock() int64 {
 	a16 := unsafe.Sizeof(structures.SuperBlock{}.S_inode_start)
 	a17 := unsafe.Sizeof(structures.SuperBlock{}.S_block_start)
 	result := a01 + a02 + a03 + a04 + a05 + a06 + a07 + a08 + a09 + a10 + a11 + a12 + a13 + a14 + a15 + a16 + a17
-	return int64(result)
+	return int32(result)
 }
 
-func SizeInode() int64 {
+func SizeInode() int32 { //92 bytes
 	a01 := unsafe.Sizeof(structures.Inode{}.I_uid)
 	a02 := unsafe.Sizeof(structures.Inode{}.I_gid)
 	a03 := unsafe.Sizeof(structures.Inode{}.I_s)
@@ -38,5 +38,5 @@ func SizeInode() int64 {
 	a08 := unsafe.Sizeof(structures.Inode{}.I_type)
 	a09 := unsafe.Sizeof(structures.Inode{}.I_perm)
 	result := a01 + a02 + a03 + a04 + a05 + a06 + a07 + a08 + a09
-	return int64(result)
+	return int32(result)
 }
