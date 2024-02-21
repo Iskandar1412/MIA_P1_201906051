@@ -11,7 +11,7 @@ func FilesCommandProps(file string, instructions []string) {
 	/*
 		var _path string //mkfile remove edit rename mkdir copy move find
 		//existe -r 		//mkfile mkdir
-		var _size int64     //mkfile
+		var _size int32     //mkfile
 		var _cont string    //mkfile
 		var _file []string  //cat
 		var _cont string    //edit

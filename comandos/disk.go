@@ -9,15 +9,16 @@ import (
 //execute -path=/home/iskandar/Escritorio/prueba.adsj
 
 func DiskCommandProps(command string, instructions []string) {
-	var _size int64 //mkdisk  fdisk
-	var _fit byte   //mkdisk  fdisk
-	var _unit byte  //mkdisk  fdisk
+	var _size int32       //mkdisk  fdisk
+	var _fit byte         //mkdisk  fdisk
+	var _unit byte        //mkdisk  fdisk
+	var _driveletter byte //rmdisk  fdisk mount
+	var _name [16]byte    //fdisk   mount
+	var _type byte        //fdisk
+	var _delete string    //fdisk
+	var _add int32        //fdisk
 	/*
-		var _drivedeletter byte   //rmdisk  fdisk mount
-		var _name string          //fdisk   mount
-		var _type string          //fdisk   mkfs
-		var _delete string        //fdisk
-		var _add string           //fdisk
+		var _type_mkfs   //mkfs
 		var _id string            //unmount mkfs
 		var _fs string            //mkfs
 	*/
@@ -30,13 +31,19 @@ func DiskCommandProps(command string, instructions []string) {
 			MKDISK_Create(_size, _fit, _unit)
 		}
 	} else if strings.ToUpper(command) == "FDISK" {
-
+		_size, _driveletter, _name, _unit, _type, _fit, _delete, _add = Values_FDISK(instructions)
+		if _size <= 0 || ToString(_name[:]) == "" || _driveletter == '0' {
+			color.Yellow("[FDISK]: Error to asign values")
+		} else {
+			FDISK_Create(_size, _driveletter, _name[:], _unit, _type, _fit, _delete, _add)
+		}
+		//fmt.Println(_size, _driveletter, _name, _unit, _type, _fit, _delete, _add)
 	} else if strings.ToUpper(command) == "RMDISK" {
-		_drivedeletter, _error := Values_RMDISK(instructions)
-		if _drivedeletter == '0' && _error == false {
+		_driveletter, _error := Values_RMDISK(instructions)
+		if _driveletter == '0' && _error == false {
 			color.Yellow("[RMDISK]: Error to asign values")
 		} else {
-			RMDISK_EXECUTE(_drivedeletter)
+			RMDISK_EXECUTE(_driveletter)
 		}
 	} else if strings.ToUpper(command) == "MOUNT" {
 
