@@ -89,10 +89,27 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 
 	//PrintarMBR(tempDisk)
 	particion_vacia := PartitionVacia()
-	if !VerifyVoidDisk(tempDisk, particion_vacia) {
-		color.Magenta("[FDISK]: Todas las particiones estan ocupadas")
+	bandera := false
+	bandera_llena := false
+	if _type == 'L' {
+		bandera_llena = false
+		bandera = true
+	} else {
+		if !VerifyVoidDisk(tempDisk, particion_vacia) {
+			bandera = false
+			bandera_llena = true
+			color.Magenta("[FDISK]: Todas las particiones estan ocupadas")
+			return
+		}
+	}
+	fmt.Println("")
+	ObtainDisksPrint(tempDisk)
+	fmt.Println("")
+
+	if !bandera && bandera_llena {
 		return
 	}
+
 	temp_p := PartitionVacia()
 	temp_p.Part_status = int8(0)
 	temp_p.Part_type = _type
@@ -189,7 +206,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 			return
 		}
 		//Caso en el que ya se pudo haber borrado un disco
-		color.Yellow("Ya se ha borrado una particion")
+		//color.Yellow("Ya se ha borrado una particion")
 		if string(tempDisk.Mbr_partitions[0].Part_name[:]) == string(_name) || string(tempDisk.Mbr_partitions[1].Part_name[:]) == string(_name) || string(tempDisk.Mbr_partitions[2].Part_name[:]) == string(_name) || string(tempDisk.Mbr_partitions[3].Part_name[:]) == string(_name) {
 			color.Red("Nombre de partición ya existente")
 			return
@@ -426,7 +443,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 			particion_ext = tempDisk.Mbr_partitions[3]
 			//fmt.Println("cuarto")
 		} else {
-			color.Red("No se puede crear particion logica ya que no existe particion extendida")
+			color.Red("[FDISK]: No se puede crear particion logica ya que no existe particion extendida")
 			return
 		}
 		//fmt.Println("siguiendo")
@@ -455,7 +472,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 				return
 			}
 			if ebr_actual.Name == ebr.Name {
-				color.Yellow("Nombre de EBR igual")
+				color.Yellow("Nombre de EBR '" + ToString(ebr.Name[:]) + "' igual")
 				return
 			}
 			if particion_ext.Part_fit == 'B' {
@@ -526,12 +543,12 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 		ebr.Part_start = inicio_particion_guardar + total_size
 		ebr.Part_next = int32(siguiente)
 		GuardarEBR(path, ebr, inicio_particion_guardar)
-		color.Green("EBR grabado")
+		color.Green("EBR '" + ToString(ebr.Name[:]) + "' grabado")
 		///modificar siguiente anterior
 		if inicio_ebr_anterior != 0 {
 			ebr_anterior.Part_next = inicio_particion_guardar
 			GuardarEBR(path, ebr_anterior, inicio_ebr_anterior)
-			color.Green("EBR anterior modificado")
+			color.Green("EBR anterior '" + ToString(ebr_anterior.Name[:]) + "' modificado")
 		}
 	}
 }

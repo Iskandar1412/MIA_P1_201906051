@@ -340,22 +340,22 @@ func AddInPartition(path string, _add int32, _unit byte, disk structures.MBR, na
 		contador := 0
 		for {
 			if ebr_inicio == -1 {
-				color.Red("Fin Lectura EBR")
+				color.Red("[FDISK]: Fin Lectura EBR")
 				break
 			}
 			ebr_actual, err := Obtener_EBR(path, ebr_inicio)
 			if err != nil {
-				color.Red("Error ADD")
+				color.Red("[FDISK]: Error ADD")
 				return
 			}
 			if string(ebr_actual.Name[:]) == name {
-				fmt.Println("Logico encontrado")
+				fmt.Println("[FDISK]: Logico encontrado")
 				if ebr_actual.Part_next == -1 {
 					//no hay siguiente partición logica, mayor a 0, menor a tamaño particion ex
 					if (ebr_actual.Part_s+Tamano(_add, _unit) > 0) && ((ebr_actual.Part_start + ebr_actual.Part_s + Tamano(_add, _unit)) < (particion_extendida.Part_start + particion_extendida.Part_s)) {
 						ebr_actual.Part_s = ebr_actual.Part_s + Tamano(_add, _unit)
 						GuardarEBR(path, ebr_actual, ebr_inicio)
-						color.Green("Espacio Logico Modificado")
+						color.Green("[FDISK]: Espacio Logico Modificado")
 						return
 					}
 				} else {
@@ -364,7 +364,7 @@ func AddInPartition(path string, _add int32, _unit byte, disk structures.MBR, na
 					if ebr_actual.Part_next != -1 {
 						ebr_siguiente, err := Obtener_EBR(path, ebr_actual.Part_next)
 						if err != nil {
-							color.Red("Error ADD")
+							color.Red("[FDISK]: Error ADD")
 							return
 						}
 						if ebr_siguiente.Part_mount == -1 {
@@ -377,7 +377,7 @@ func AddInPartition(path string, _add int32, _unit byte, disk structures.MBR, na
 								GuardarEBR(path, ebr_actual, (ebr_actual.Part_next + Tamano(_add, _unit)))
 								ebr_actual.Part_s = ebr_actual.Part_s + Tamano(_add, _unit)
 								GuardarEBR(path, ebr_actual, ebr_inicio)
-								color.Green("Espacio Logico Modificado")
+								color.Green("[FDISK]: Espacio Logico Modificado")
 							}
 						}
 					} else {
@@ -386,7 +386,7 @@ func AddInPartition(path string, _add int32, _unit byte, disk structures.MBR, na
 						if (ebr_actual.Part_s+Tamano(_add, _unit) > 0) && ((ebr_actual.Part_s + ebr_actual.Part_start + Tamano(_add, _unit)) < (particion_extendida.Part_start + particion_extendida.Part_s)) {
 							ebr_actual.Part_s = ebr_actual.Part_s + Tamano(_add, _unit)
 							GuardarEBR(path, ebr_actual, ebr_inicio)
-							color.Green("Espacio Logico Modificado")
+							color.Green("[FDISK]: Espacio Logico Modificado")
 						}
 					}
 					if !agrego {
@@ -396,7 +396,10 @@ func AddInPartition(path string, _add int32, _unit byte, disk structures.MBR, na
 						if (ebr_actual.Part_s+Tamano(_add, _unit) > 0) && (ebr_actual.Part_start+ebr_actual.Part_s+Tamano(_add, _unit) < ebr_actual.Part_next) {
 							ebr_actual.Part_s = ebr_actual.Part_s + Tamano(_add, _unit)
 							GuardarEBR(path, ebr_actual, ebr_inicio)
-							color.Green("Espacio Logico Modificado")
+							color.Green("[FDISK]: Espacio Logico Modificado")
+							return
+						} else {
+							color.Red("[FDISK]: Error al agregar espacio (El tamaño colisiona con otra partición o supera la capacidad del disco)")
 							return
 						}
 					}
@@ -421,7 +424,7 @@ func AddInPartition(path string, _add int32, _unit byte, disk structures.MBR, na
 				particion.Part_s = particion.Part_s + Tamano(_add, _unit)
 				GuardarParticionV2(path, particion, int32(numero))
 				agrego = true
-				color.Green("Espacio Modificado")
+				color.Green("[FDISK]: Espacio Modificado")
 			}
 			//no se creo particion des puesd de esta
 		} else if particion_siguiente.Part_status == -1 && particion_siguiente.Part_s == 0 {
@@ -431,7 +434,7 @@ func AddInPartition(path string, _add int32, _unit byte, disk structures.MBR, na
 				particion.Part_s = particion.Part_s + Tamano(_add, _unit)
 				GuardarParticionV2(path, particion, int32(numero))
 				agrego = true
-				color.Green("Espacio Modificado")
+				color.Green("[FDISK]: Espacio Modificado")
 			}
 		}
 	} else {
@@ -441,17 +444,17 @@ func AddInPartition(path string, _add int32, _unit byte, disk structures.MBR, na
 			particion.Part_s = particion.Part_s + Tamano(_add, _unit)
 			GuardarParticionV2(path, particion, int32(numero))
 			agrego = true
-			color.Green("Espacio Modificado")
+			color.Green("[FDISK]: Espacio Modificado")
 		}
 	}
 	if !agrego {
 		if (particion.Part_s+Tamano(_add, _unit) > 0) && (particion.Part_s+particion.Part_start+Tamano(_add, _unit) < inicio_siguiente) {
 			particion.Part_s = particion.Part_s + Tamano(_add, _unit)
 			GuardarParticionV2(path, particion, int32(numero))
-			color.Green("Espacio Modificado")
+			color.Green("[FDISK]: Espacio Modificado")
 			return
 		} else {
-			color.Red("No se pudo modificar el espacio")
+			color.Red("[FDISK]: No se pudo modificar el espacio")
 			return
 		}
 	}

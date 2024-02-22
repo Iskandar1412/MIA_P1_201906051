@@ -29,15 +29,29 @@ func VerifyVoidDisk(disk structures.MBR, void_partition structures.Partition) bo
 	bandera := false
 	for i := range disk.Mbr_partitions {
 		if disk.Mbr_partitions[i] == void_partition {
-			fmt.Print(" :: Particion ", (i + 1), " Vacio :: ")
+			// fmt.Print(" :: Particion ", (i + 1), " Vacio :: ")
 			bandera = true
 		} else {
-			fmt.Print(" :: Particion ", (i + 1), " Lleno :: ")
+			// fmt.Print(" :: Particion ", (i + 1), " Lleno :: ")
 			bandera = false
 		}
 	}
-	fmt.Print("\n")
+	// fmt.Print("\n")
 	return bandera
+}
+
+func ObtainDisksPrint(disk structures.MBR) {
+	particion := PartitionVacia()
+	for i := range disk.Mbr_partitions {
+		if disk.Mbr_partitions[i] == particion {
+			fmt.Print(" :: Particion ", (i + 1), " Vacio :: ")
+			// bandera = true
+		} else {
+			fmt.Print(" :: Particion ", (i + 1), " Lleno :: ")
+			// bandera = false
+		}
+	}
+	fmt.Print("\n")
 }
 
 func PartitionVacia() structures.Partition {

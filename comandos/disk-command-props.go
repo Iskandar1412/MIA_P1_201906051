@@ -36,7 +36,13 @@ func DiskCommandProps(command string, instructions []string) {
 			if ToString(_name[:]) == "" {
 				color.Yellow("[FDISK]: Error to asign values for (unamed) disk")
 			} else {
-				color.Yellow("[FDISK]: Error to asign values for disk '" + string(_name[:]) + "'")
+				if _delete == "FULL" {
+					FDISK_Create(_size, _driveletter, _name[:], _unit, _type, _fit, _delete, _add)
+				} else if _add != 0 {
+					FDISK_Create(_size, _driveletter, _name[:], _unit, _type, _fit, _delete, _add)
+				} else {
+					color.Yellow("[FDISK]: Error to asign values for disk '" + string(_name[:]) + "'")
+				}
 			}
 		} else {
 			FDISK_Create(_size, _driveletter, _name[:], _unit, _type, _fit, _delete, _add)
