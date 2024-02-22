@@ -38,3 +38,12 @@ func SizeMBR() int32 { //153 bytes
 	result := int32(a01+a02+a03+a04) + a05
 	return result
 }
+
+func SizeMBR_NotPartitions() int32 {
+	a01 := unsafe.Sizeof(structures.MBR{}.Mbr_tamano)
+	a02 := unsafe.Sizeof(structures.MBR{}.Mbr_fecha_creacion)
+	a03 := unsafe.Sizeof(structures.MBR{}.Mbr_disk_signature)
+	a04 := unsafe.Sizeof(structures.MBR{}.Dsk_fit)
+	result := int32(a01 + a02 + a03 + a04)
+	return result
+}
