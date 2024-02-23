@@ -56,7 +56,7 @@ func DiskCommandProps(command string, instructions []string) {
 			RMDISK_EXECUTE(_driveletter)
 		}
 	} else if strings.ToUpper(command) == "MOUNT" {
-
+		color.Green("Mount")
 	} else if strings.ToUpper(command) == "UNMOUNT" {
 
 	} else if strings.ToUpper(command) == "MKFS" {
