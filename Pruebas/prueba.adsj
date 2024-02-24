@@ -1,25 +1,32 @@
 # execute -path=/home/iskandar/Escritorio/Proyectos/Git/MIA_1S2024_201906051/Proyectos/MIA_P1_201906051/Pruebas/prueba.adsj
 # execute -path=Pruebas/prueba.adsj
 
-MKdisK -Size=10 -unit=M -fit=bF
-#mKdISk
-#corre que te corre con size -name=asdf
-       #mkdisk -size="13" -unit=m -fit=bF #esto es el comentario
-                #esto otro tambien lo ignora
+#MKdisK -Size=10 -unit=M -fit=bF
+#fdisk -name=Parte2 -driveletter=A -size=4 -unit=M -type=E
+#Fdisk -name="Part1" -driveletter=A -size=2 -type=P  #-delete=FULL
+#Fdisk -name="Part3" -driveletter=A -size=400 -type=P 
+#Fdisk -name="Part5" -driveletter=A -size=241 -type=P 
+#fdisk -driveletter=A -size=12 -name=asdf -type=L
+#fdisk -driveletter=A -size=12 -name=asdf -type=L
 #fdisk -driveletter=A -size=450 -unit=k -name=donce -type=L
-fdisk -name=Parte2 -driveletter=A -size=4 -unit=M -type=E
-Fdisk -name="Part1" -driveletter=A -size=2 -type=P  #-delete=FULL
-Fdisk -name="Part3" -driveletter=A -size=400 -type=P 
-Fdisk -name="Part5" -driveletter=A -size=241 -type=P 
-#fdisk -name=UWU -driveletter=A -size=8
-#fdisk -driveletter=A -size=2 -unit=M -type=E
-#fdisk -driveletter=A -type=P -size=4 -name=Fukka
-fdisk -driveletter=A -size=12 -name=asdf -type=L
-fdisk -driveletter=A -size=12 -name=asdf -type=L
-fdisk -driveletter=A -size=450 -unit=k -name=donce -type=L
-#fdisk -driveletter=A -delete=full -name=Parte2
-fdisk -driveletter=A -add=500 -size=10 -unit=k -name=asdf
 
+#Disco 2
+#MKdisK -Size=12 -unit=M -fit=fF
+#fdisk -name=Parte6 -driveletter=B -size=4 -unit=M -type=E
+#Fdisk -name="Part55" -driveletter=B -size=2 -type=P  #-delete=FULL
+#Fdisk -name="Part9" -driveletter=B -size=400 -type=P 
+#Fdisk -name="Part7" -driveletter=B -size=241 -type=P 
+#fdisk -driveletter=B -size=12 -name=conociendo -type=L
+#fdisk -driveletter=B -size=12 -name=asdf -type=L
+#fdisk -driveletter=B -size=450 -unit=k -name=ind -type=L
+
+##fdisk -driveletter=A -delete=full -name=Parte2
+##fdisk -driveletter=A -add=500 -size=10 -unit=k -name=asdf
+mount -driveletter=A -name=asdf
+mount -driveletter=B -name=Part55
+mount -driveletter=A -name=Part1
+mount -driveletter=B -name=Part9
+mount -driveletter=A -name=Part3
 
 
 #rep -driveletter=A

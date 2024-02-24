@@ -56,7 +56,14 @@ func DiskCommandProps(command string, instructions []string) {
 			RMDISK_EXECUTE(_driveletter)
 		}
 	} else if strings.ToUpper(command) == "MOUNT" {
-		color.Green("Mount")
+		_driveletter, _name, err := Values_Mount(instructions)
+		if err && (_driveletter == '0') {
+			color.Yellow("[MOUNT]: Error to asign values")
+		} else {
+			MOUNT_EXECUTE(_driveletter, _name[:])
+			//fmt.Println("Mount", _driveletter, _name)
+		}
+		//fmt.Println(Partitions_Mounted)
 	} else if strings.ToUpper(command) == "UNMOUNT" {
 
 	} else if strings.ToUpper(command) == "MKFS" {

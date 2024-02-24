@@ -8,6 +8,8 @@ import (
 	"github.com/fatih/color"
 )
 
+// var Partitions_Mounted []interface{}
+
 // MIA_P1_201906051/structures
 // MIA_P1_201906051/size
 // execute -path=/home/iskandar/Escritorio/prueba.adsj
@@ -23,6 +25,7 @@ func main() {
 		// input = strings.TrimSpace(input)
 		if strings.ToLower(input) == "exit" {
 			color.Cyan("Saliendo del programa")
+			//color.Cyan(particiones_montadas)
 			break
 		} else {
 			instrucciones := comandos.ObtenerComandos(input)

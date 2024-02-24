@@ -119,7 +119,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 	temp_p.Part_name = DevolverNombreByte(string(_name))
 
 	ebr := structures.EBR{}
-	ebr.Part_mount = '0'
+	ebr.Part_mount = int8(0)
 	ebr.Part_fit = _fit
 	ebr.Part_start = int32(0)
 	ebr.Part_s = Tamano(_size, _unit)
@@ -199,7 +199,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 				ebr.Part_s = int32(-1)
 				ebr.Part_next = int32(-1)
 				ebr.Name = DevolverNombreByte("-1")
-				Escribir_EBR(path, ebr, temp_p.Part_start)
+				Escribir_EBR("FDISK", path, ebr, temp_p.Part_start)
 				color.Blue("[FDISK]: EBR grabado Exitosamente")
 			}
 			//fmt.Println(ebr)
@@ -295,7 +295,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 					ebr.Part_s = int32(-1)
 					ebr.Part_next = int32(-1)
 					ebr.Name = DevolverNombreByte("-1")
-					Escribir_EBR(path, ebr, temp_p.Part_start)
+					Escribir_EBR("FDISK", path, ebr, temp_p.Part_start)
 				}
 			}
 		} else if tempDisk.Dsk_fit == 'F' {
@@ -347,7 +347,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 					ebr.Part_s = int32(-1)
 					ebr.Part_next = int32(-1)
 					ebr.Name = DevolverNombreByte("-1")
-					Escribir_EBR(path, ebr, temp_p.Part_start)
+					Escribir_EBR("FDISK", path, ebr, temp_p.Part_start)
 				}
 			}
 		} else if tempDisk.Dsk_fit == 'W' {
@@ -494,7 +494,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 			} else if particion_ext.Part_fit == 'F' {
 				//First
 				//fmt.Println("First")
-				if ebr_actual.Part_mount == -1 {
+				if ebr_actual.Part_mount == int8(-1) {
 					if temp_p.Part_s < ebr_actual.Part_s {
 						size_particion_actual = ebr_actual.Part_s
 						inicio_particion_guardar = ebr_inicio
@@ -518,7 +518,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 				}
 			}
 			if size_particion_actual == 0 && inicio_particion_guardar == 0 && ebr_actual.Part_next == -1 {
-				if contador == 0 && ebr_actual.Part_mount == -1 {
+				if contador == 0 && ebr_actual.Part_mount == int8(-1) {
 					//fmt.Println("vamos")
 					//modificar ebr
 					inicio_particion_guardar = ebr_inicio

@@ -77,7 +77,7 @@ func GuardarParticionV2(path string, particion structures.Partition, numero int3
 }
 
 // Escribir EBR Particion//-
-func Escribir_EBR(path string, ebr_data structures.EBR, start int32) {
+func Escribir_EBR(comando string, path string, ebr_data structures.EBR, start int32) {
 	file, err := os.OpenFile(path, os.O_RDWR, 0666)
 	if err != nil {
 		color.Red("[FDISK]: No se pudo abrir el archivo")
@@ -97,7 +97,7 @@ func Escribir_EBR(path string, ebr_data structures.EBR, start int32) {
 	color.Cyan("[FDISK]: :D")
 }
 
-func Escribir_Particion(path string, particion structures.Partition, posicion int32) {
+func Escribir_Particion(comando string, path string, particion structures.Partition, posicion int32) {
 	file, err := os.OpenFile(path, os.O_RDWR, 0666)
 	if err != nil {
 		color.Red("[FDISK]: No se pudo abrir el archivo")
@@ -242,6 +242,7 @@ func DeletePartitionFull(path string, disk structures.MBR, name string) {
 			if string(ebr_actual.Name[:]) == name {
 				fmt.Println("Encontrado Lógico")
 				ebr_actual.Part_mount = -1
+
 				ebr_actual.Name = DevolverNombreByte("-1")
 				GuardarEBR(path, ebr_actual, ebr_inicio)
 				VaciarParticion(path, ebr_actual.Part_start, ebr_actual.Part_s-size.SizeEBR())
@@ -352,6 +353,7 @@ func AddInPartition(path string, _add int32, _unit byte, disk structures.MBR, na
 				fmt.Println("[FDISK]: Logico encontrado")
 				if ebr_actual.Part_next == -1 {
 					//no hay siguiente partición logica, mayor a 0, menor a tamaño particion ex
+
 					if (ebr_actual.Part_s+Tamano(_add, _unit) > 0) && ((ebr_actual.Part_start + ebr_actual.Part_s + Tamano(_add, _unit)) < (particion_extendida.Part_start + particion_extendida.Part_s)) {
 						ebr_actual.Part_s = ebr_actual.Part_s + Tamano(_add, _unit)
 						GuardarEBR(path, ebr_actual, ebr_inicio)

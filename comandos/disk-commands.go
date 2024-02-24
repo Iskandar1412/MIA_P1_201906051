@@ -4,6 +4,8 @@ import (
 	"MIA_P1_201906051/structures"
 	"encoding/binary"
 	"os"
+	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/fatih/color"
@@ -120,7 +122,148 @@ func RMDISK_EXECUTE(_driveletter byte) {
 	color.Green("[RMDISK]: Disco '" + string(_driveletter) + ".dsk' Borrado")
 }
 
-// Globals
+// MOUNT
 
-var Max_logical_partitions int32 = 23
-var Mounted_prefix int32 = 17
+func Values_Mount(instructions []string) (byte, [16]byte, bool) {
+	var _driveletter byte
+	var _name [16]byte
+	var _error = false
+	for _, valor := range instructions {
+		if strings.HasPrefix(strings.ToLower(valor), "driveletter") {
+			var value = TieneDriveLetter("MOUNT", valor)
+			_driveletter = value
+		} else if strings.HasPrefix(strings.ToLower(valor), "name") {
+			var value = TieneNombre("MOUNT", valor)
+			if len(value) > 16 {
+				color.Red("[MOUNT]: El nombre no puede ser mayor a 16 caracteres")
+				_error = true
+				break
+			} else {
+				_name = DevolverNombreByte(value)
+			}
+		} else {
+			color.Yellow("[MOUNT]: Atributo no reconocido")
+		}
+	}
+	return _driveletter, _name, _error
+}
+
+func MOUNT_EXECUTE(_driveletter byte, _name []byte) {
+	path := "MIA/P1/Disks/" + string(_driveletter) + ".dsk"
+	if !ExisteArchivo("MOUNT", path) {
+		color.Yellow("[MOUNT]: Cancel the operation because not yet a file")
+		return
+	}
+
+	//obtener disco
+	tempDisk, existe := ObtainMBRDisk(path)
+	if !existe {
+		color.Red("[MOUNT]: Error en la obtención del disco")
+		return
+	}
+
+	conjunto, error := BuscarParticion(tempDisk, _name, path)
+	if error {
+		color.Red("[MOUNT]: Partición no encontrada")
+		return
+	}
+
+	//fmt.Println(string(_driveletter))
+	//fmt.Println(conjunto)
+
+	if conjunto[0] == nil {
+		color.Red("[MOUNT]: No hay particion para usar")
+		return
+	}
+
+	particion := structures.Partition{}
+	if temp, ok := conjunto[0].(structures.Partition); ok {
+		v := reflect.ValueOf(temp)
+		reflect.ValueOf(&particion).Elem().Set(v)
+	}
+	//inicio_particion := conjunto[1]
+	//logica_interfaz := conjunto[2]
+	logica := structures.EBR{}
+	//inicio_logica := conjunto[3]
+	numero := 1
+	//bandera := false
+	contador := 1
+	//revisar anteriores montadas en el caso que hayan
+	for _, discos := range Partitions_Mounted {
+		//fmt.Println(discos, " - ")
+		if disco, ok := discos.([]string); ok {
+			var nombredisco = ""
+			// fmt.Println(disco[2])
+			nombredisco = disco[2]
+			if nombredisco == string(_driveletter) {
+				//color.Red("[MOUNT]: El disco ya está montado")
+				if disco[1] == ToString(_name) {
+					color.Red("[MOUNT]: La partición ya está montada")
+					// bandera = true
+					return
+				}
+				contador += 1
+				continue
+			}
+		}
+		numero = contador
+		//fmt.Println(nombredisco)
+		//validacion := false
+	}
+
+	//crear particion
+	nombre_particion_montada := string(_driveletter) + strconv.Itoa(numero) + "51"
+	nombre_bytes := DevolverNombreByte(nombre_particion_montada)
+	var arr_partition []string
+	arr_partition = append(arr_partition, nombre_particion_montada, ToString(_name), string(_driveletter), path)
+	Partitions_Mounted = append(Partitions_Mounted, arr_partition)
+
+	color.Magenta("Montando partición... " + nombre_particion_montada)
+
+	if reflect.TypeOf(conjunto[2]) == reflect.TypeOf(structures.EBR{}) {
+		if temp_log, ok := conjunto[2].(structures.EBR); ok {
+			v := reflect.ValueOf(temp_log)
+			reflect.ValueOf(&logica).Elem().Set(v)
+		}
+		logica.Part_mount = int8(1)
+		conjunto[0] = nil
+		conjunto[1] = nil
+		Escribir_EBR("MOUNT", path, logica, conjunto[3].(int32))
+	}
+
+	if reflect.TypeOf(conjunto[0]) == reflect.TypeOf(structures.Partition{}) {
+		particion.Part_status = int8(1)
+		particion.Part_id = [4]byte(nombre_bytes[:])
+		Escribir_Particion("MOUNT", path, particion, conjunto[1].(int32))
+		if particion.Part_type == 'E' {
+			return
+		}
+	}
+
+	inicio := int32(0)
+	if conjunto[0] != nil {
+		inicio = particion.Part_start
+	}
+	if conjunto[2] != nil {
+		inicio = logica.Part_start
+	}
+
+	superblock, err := Obtener_Superbloque("MOUNT", path, ToString(_name))
+	if err {
+		fecha := ObFechaInt()
+		superblock.S_mtime = fecha
+		val := superblock.S_mnt_count
+		val += 1
+		superblock.S_mnt_count = val
+		Guardar_Superbloque("MOUNT", path, inicio, superblock)
+	}
+	//fmt.Println(superblock)
+	//Particiones_Montadas = append(Particiones_Montadas, "asdf")
+	//fmt.Println(particion, inicio_particion, logica, inicio_logica)
+}
+
+// MKFS
+
+func Values_MKFS(instructions []string) {
+
+}

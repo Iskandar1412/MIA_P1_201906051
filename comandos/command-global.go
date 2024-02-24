@@ -6,6 +6,8 @@ import (
 	"github.com/fatih/color"
 )
 
+// var Particiones_Montadas []string
+
 func GlobalCom(lista []string) {
 	for _, comm := range lista {
 		// Administracion de Discos
