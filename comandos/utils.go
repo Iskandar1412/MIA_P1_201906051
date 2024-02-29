@@ -217,6 +217,15 @@ func TieneNombre(comando string, valor string) string {
 	}
 }
 
+func NameArchivosByte(value string) [10]byte {
+	padText := make([]byte, 10)
+	for i := range padText {
+		padText[i] = '\x00'
+	}
+	copy(padText[:], []byte(value))
+	return [10]byte(padText)
+}
+
 func DevolverNombreByte(value string) [16]byte {
 	padText := make([]byte, 16)
 	for i := range padText {
@@ -224,6 +233,15 @@ func DevolverNombreByte(value string) [16]byte {
 	}
 	copy(padText[:], []byte(value))
 	return [16]byte(padText)
+}
+
+func DevolverContenidoArchivo(value string) [64]byte {
+	padText := make([]byte, 64)
+	for i := range padText {
+		padText[i] = '\x00'
+	}
+	copy(padText[:], []byte(value))
+	return [64]byte(padText)
 }
 
 func TieneTypeFDISK(valor string) byte {
@@ -280,11 +298,60 @@ func TieneAdd(valor string) int32 {
 	return int32(num)
 }
 
-func TieneID(comando string, valor string) {
+func TieneID(comando string, valor string) string {
 	if !strings.HasPrefix(strings.ToLower(valor), "id=") {
 		color.Red("[" + comando + "]: No tiene id o tiene un valor no valido")
-		return
+		return ""
 	}
+	value := strings.Split(valor, "=")
+	if len(value) < 2 {
+		color.Red("[" + comando + "]: No tiene id Valido")
+		return ""
+	}
+	return value[1]
+}
+
+func TieneTypeMKFS(valor string) string {
+	if !strings.HasPrefix(strings.ToLower(valor), "type=") {
+		color.Red("[MKFS]: No tiene Type Especificado")
+		return ""
+	}
+	value := strings.Split(valor, "=")
+	if len(value) < 2 {
+		color.Red("[MKFS]: No tiene Type Especificado")
+		return ""
+	}
+	if !(strings.ToUpper(value[1]) == "FULL") {
+		color.Red("[MKSF]: No tiene Type valido")
+		return ""
+	}
+	return "FULL"
+}
+
+func TieneFS(valor string) string {
+	if !strings.HasPrefix(strings.ToLower(valor), "fs=") {
+		color.Red("[MKFS]: No tiene Type Especificado")
+		return ""
+	}
+
+	value := strings.Split(valor, "=")
+	if len(value) < 2 {
+		color.Red("[MKFS]: No tiene Type Especificado")
+		return ""
+	}
+
+	if !(strings.ToUpper(value[1]) == "3FS" || strings.ToUpper(value[1]) == "2FS") {
+		color.Red("[MKSF]: No tiene Type valido")
+		return ""
+	}
+
+	if (strings.ToUpper(value[1])) == "3FS" {
+		return "3FS"
+	} else if (strings.ToUpper(value[1])) == "2FS" {
+		return "2FS"
+	}
+
+	return "2FS"
 }
 
 func TieneUser(comando string, valor string) {

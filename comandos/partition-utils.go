@@ -80,40 +80,40 @@ func GuardarParticionV2(path string, particion structures.Partition, numero int3
 func Escribir_EBR(comando string, path string, ebr_data structures.EBR, start int32) {
 	file, err := os.OpenFile(path, os.O_RDWR, 0666)
 	if err != nil {
-		color.Red("[FDISK]: No se pudo abrir el archivo")
+		color.Red("[" + comando + "]: No se pudo abrir el archivo")
 		return
 	}
 	defer file.Close()
 	if _, err := file.Seek(int64(start), 0); err != nil {
-		color.Red("[FDISK]: No se pudo mover el puntero")
+		color.Red("[" + comando + "]: No se pudo mover el puntero")
 		return
 	}
 	//fmt.Println(ebr_data)
 
 	if err := binary.Write(file, binary.LittleEndian, &ebr_data); err != nil {
-		color.Red("[FDISK]: No se pudo escribir en el archivo el EBR")
+		color.Red("[" + comando + "]: No se pudo escribir en el archivo el EBR")
 		return
 	}
-	color.Cyan("[FDISK]: :D")
+	color.Cyan("[" + comando + "]: EBR reescrito correctamente")
 }
 
 func Escribir_Particion(comando string, path string, particion structures.Partition, posicion int32) {
 	file, err := os.OpenFile(path, os.O_RDWR, 0666)
 	if err != nil {
-		color.Red("[FDISK]: No se pudo abrir el archivo")
+		color.Red("[" + comando + "]: No se pudo abrir el archivo")
 		return
 	}
 	defer file.Close()
 	if _, err := file.Seek(int64(posicion), 0); err != nil {
-		color.Red("[FDISK]: No se pudo mover el puntero")
+		color.Red("[" + comando + "]: No se pudo mover el puntero")
 		return
 	}
 	//fmt.Println(particion)
 	if err := binary.Write(file, binary.LittleEndian, &particion); err != nil {
-		color.Red("[FDISK]: No se pudo escribir en el archivo la Particion")
+		color.Red("[" + comando + "]: No se pudo escribir en el archivo la Particion")
 		return
 	}
-	//color.Cyan("[FDISK]: :D")
+	color.Cyan("[" + comando + "]: Particion reescrita correctamente")
 } //Escribir EBR Particion//-
 
 // Guardar EBR
@@ -224,7 +224,7 @@ func DeletePartitionFull(path string, disk structures.MBR, name string) {
 			//numero_particion_ext = 4
 			particion_extendida = disk.Mbr_partitions[3]
 		} else {
-			color.Yellow("No existen particiones lógicas para borrar")
+			color.Yellow("[DELETE]: No existen particiones lógicas para borrar")
 			return
 		}
 		//obtención particiones lógicas
@@ -236,17 +236,17 @@ func DeletePartitionFull(path string, disk structures.MBR, name string) {
 			}
 			ebr_actual, err := Obtener_EBR(path, ebr_inicio)
 			if err != nil {
-				color.Red("Error")
+				color.Red("[DELETE]: Error al obtener EBR")
 				return
 			}
 			if string(ebr_actual.Name[:]) == name {
-				fmt.Println("Encontrado Lógico")
+				fmt.Println("[DELETE]: Encontrado Lógico")
 				ebr_actual.Part_mount = -1
 
 				ebr_actual.Name = DevolverNombreByte("-1")
 				GuardarEBR(path, ebr_actual, ebr_inicio)
 				VaciarParticion(path, ebr_actual.Part_start, ebr_actual.Part_s-size.SizeEBR())
-				color.Green("Particion Eliminada")
+				color.Green("[DELETE]: Particion Eliminada")
 				return
 			}
 			ebr_inicio = ebr_actual.Part_next
@@ -255,35 +255,35 @@ func DeletePartitionFull(path string, disk structures.MBR, name string) {
 	}
 	//En el caso de ser primaraia o extendida
 	if variableu != 0 || valores != 0 {
-		fmt.Println("Primario o Extendido")
+		fmt.Println("[DELETE]: Primario o Extendido")
 		particion.Part_status = -1
 		particion.Part_name = DevolverNombreByte("-1")
 		if numero == 1 {
 			disk.Mbr_partitions[0] = particion
 			GuardarParticion(path, disk)
 			VaciarParticion(path, particion.Part_start, particion.Part_s)
-			color.Green("Particion 0 Eliminada")
+			color.Green("[DELETE]: Particion 0 Eliminada")
 		}
 		if numero == 2 {
 			disk.Mbr_partitions[1] = particion
 			GuardarParticion(path, disk)
 			VaciarParticion(path, particion.Part_start, particion.Part_s)
-			color.Green("Particion 1 Eliminada")
+			color.Green("[DELETE]: Particion 1 Eliminada")
 		}
 		if numero == 3 {
 			disk.Mbr_partitions[2] = particion
 			GuardarParticion(path, disk)
 			VaciarParticion(path, particion.Part_start, particion.Part_s)
-			color.Green("Particion 2 Eliminada")
+			color.Green("[DELETE]: Particion 2 Eliminada")
 		}
 		if numero == 4 {
 			disk.Mbr_partitions[3] = particion
 			GuardarParticion(path, disk)
 			VaciarParticion(path, particion.Part_start, particion.Part_s)
-			color.Green("Particion 3 Eliminada")
+			color.Green("[DELETE]: Particion 3 Eliminada")
 		}
 	} else {
-		color.Red("No se pudo encontrar la partición")
+		color.Red("[DELETE]: No se pudo encontrar la partición")
 		return
 	}
 }

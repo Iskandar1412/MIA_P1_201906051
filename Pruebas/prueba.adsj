@@ -1,6 +1,7 @@
 # execute -path=/home/iskandar/Escritorio/Proyectos/Git/MIA_1S2024_201906051/Proyectos/MIA_P1_201906051/Pruebas/prueba.adsj
 # execute -path=Pruebas/prueba.adsj
 
+#Disco 1
 #MKdisK -Size=10 -unit=M -fit=bF
 #fdisk -name=Parte2 -driveletter=A -size=4 -unit=M -type=E
 #Fdisk -name="Part1" -driveletter=A -size=2 -type=P  #-delete=FULL
@@ -22,11 +23,21 @@
 
 ##fdisk -driveletter=A -delete=full -name=Parte2
 ##fdisk -driveletter=A -add=500 -size=10 -unit=k -name=asdf
+
+#Montar particiones
 mount -driveletter=A -name=asdf
 mount -driveletter=B -name=Part55
 mount -driveletter=A -name=Part1
 mount -driveletter=B -name=Part9
 mount -driveletter=A -name=Part3
 
+
+#Desmontar particiones
+#unmount -id=A151
+#unmount -id=A351
+
+#Formateo de disco MKFS
+#mkfs -id=A151 -fs=3fs
+mkfs -id=A351 -type=full
 
 #rep -driveletter=A
