@@ -17,11 +17,11 @@ func DiskCommandProps(command string, instructions []string) {
 	var _type byte        //fdisk
 	var _delete string    //fdisk
 	var _add int32        //fdisk
+	var _id string        //unmount mkfs
+	var _type_mkfs string //mkfs
+	var _fs string        //mkfs
 	/*
-		var _type_mkfs   //mkfs
-		var _id string            //unmount mkfs
-		var _fs string            //mkfs
-	*/
+	 */
 
 	if strings.ToUpper(command) == "MKDISK" {
 		_size, _fit, _unit = Values_MKDISK(instructions)
@@ -65,9 +65,23 @@ func DiskCommandProps(command string, instructions []string) {
 		}
 		//fmt.Println(Partitions_Mounted)
 	} else if strings.ToUpper(command) == "UNMOUNT" {
-
+		var err bool
+		_id, err = Values_Unmount(instructions)
+		if !err {
+			color.Yellow("[UNMOUNT]: Error to asign values")
+		} else {
+			UNMOUNT_EXECUTE("UNMOUNT", _id)
+			// fmt.Println(_id)
+		}
 	} else if strings.ToUpper(command) == "MKFS" {
-
+		var err bool
+		_id, _type_mkfs, _fs, err = Values_MKFS(instructions)
+		if !err {
+			color.Yellow("[MKFS]: Error to asign values")
+		} else {
+			MKFS_EXECUTE(_id, _type_mkfs, _fs)
+			//fmt.Println(_id, _type_mkfs, _fs)
+		}
 	} else {
 		color.Red("[DiskComandProps]: Internal Error")
 	}

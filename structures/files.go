@@ -30,6 +30,6 @@ type Inode struct { //92 bytes
 	I_ctime int32     //fecha en la que se creo el inodo
 	I_mtime int32     //ultima fecha en la que se modifica el inodo
 	I_block [16]int32 //array en los que los primeros 12 registros son bloques directos si no son utilizados valor -1
-	I_type  byte      //indica si es archivo o carpeta (1 = archivo, 2 = carpeta)
-	I_perm  [3]byte   //guarda los permisos del archivo R (permiso de lectura) W (permiso escritura) X (permiso ejecucion)
+	I_type  int32     //indica si es archivo o carpeta (1 = archivo, 2 = carpeta)
+	I_perm  int32     //guarda los permisos del archivo R (permiso de lectura) W (permiso escritura) X (permiso ejecucion)
 }

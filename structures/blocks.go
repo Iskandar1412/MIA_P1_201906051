@@ -3,7 +3,7 @@ package structures
 //BLOQUES
 
 type Content struct { //16 bytes
-	B_name  [12]byte //nombe de carpeta o archivo
+	B_name  [10]byte //nombe de carpeta o archivo
 	B_inodo int32    //apuntador hacia un inodo asociado al archivo o carpeta
 }
 
