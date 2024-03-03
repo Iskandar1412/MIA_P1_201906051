@@ -226,6 +226,15 @@ func NameArchivosByte(value string) [10]byte {
 	return [10]byte(padText)
 }
 
+func IDParticionByte(value string) [4]byte {
+	padText := make([]byte, 4)
+	for i := range padText {
+		padText[i] = '\x00'
+	}
+	copy(padText[:], []byte(value))
+	return [4]byte(padText)
+}
+
 func DevolverNombreByte(value string) [16]byte {
 	padText := make([]byte, 16)
 	for i := range padText {
@@ -233,6 +242,15 @@ func DevolverNombreByte(value string) [16]byte {
 	}
 	copy(padText[:], []byte(value))
 	return [16]byte(padText)
+}
+
+func DevolverContenidoJournal(value string) [150]byte {
+	padText := make([]byte, 150)
+	for i := range padText {
+		padText[i] = '\x00'
+	}
+	copy(padText[:], []byte(value))
+	return [150]byte(padText)
 }
 
 func DevolverContenidoArchivo(value string) [64]byte {
@@ -354,18 +372,30 @@ func TieneFS(valor string) string {
 	return "2FS"
 }
 
-func TieneUser(comando string, valor string) {
+func TieneUser(comando string, valor string) string {
 	if !strings.HasPrefix(strings.ToLower(valor), "user=") {
 		color.Red("[" + comando + "]: No tiene user o tiene un valor no valido")
-		return
+		return ""
 	}
+	value := strings.Split(valor, "=")
+	if len(value) < 2 {
+		color.Red("[" + comando + "]: No tiene user Valido")
+		return ""
+	}
+	return value[1]
 }
 
-func TienePassword(comando string, valor string) {
+func TienePassword(comando string, valor string) string {
 	if !strings.HasPrefix(strings.ToLower(valor), "pass=") {
 		color.Red("[" + comando + "]: No tiene password o tiene un valor no valido")
-		return
+		return ""
 	}
+	value := strings.Split(valor, "=")
+	if len(value) < 2 {
+		color.Red("[" + comando + "]: No tiene password Valido")
+		return ""
+	}
+	return value[1]
 
 }
 
