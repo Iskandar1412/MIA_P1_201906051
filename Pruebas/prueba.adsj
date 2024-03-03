@@ -26,18 +26,28 @@
 
 #Montar particiones
 mount -driveletter=A -name=asdf
-mount -driveletter=B -name=Part55
+#mount -driveletter=B -name=Part55
 mount -driveletter=A -name=Part1
-mount -driveletter=B -name=Part9
+#mount -driveletter=B -name=Part9
 mount -driveletter=A -name=Part3
+mount -name=Parte2 -driveletter=A
 
 
 #Desmontar particiones
 #unmount -id=A151
 #unmount -id=A351
+#unmount -id=A251
+#unmount -id=A451
 
 #Formateo de disco MKFS
 #mkfs -id=A151 -fs=3fs
 mkfs -id=A351 -type=full
+mkfs -id=A451 -type=full
+mkfs -id=A251 -fs=3fs -type=full
+
+login -user=root -pass=123 -id=A251
+mkgrp -name=grupoB
+logout
+mkgrp -name=grupoA
 
 #rep -driveletter=A
