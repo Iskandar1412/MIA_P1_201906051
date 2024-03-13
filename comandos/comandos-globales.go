@@ -12,6 +12,18 @@ import (
 
 var Partitions_Mounted []interface{}
 
+type Usuario struct {
+	User         [10]byte
+	Password     [10]byte
+	Id_Particion [4]byte
+}
+
+var UsuarioLogeado = Usuario{
+	User:         NameArchivosByte(""),
+	Password:     NameArchivosByte(""),
+	Id_Particion: IDParticionByte(""),
+}
+
 func ObtenerComandos(x string) []string {
 	var comandos []string
 	atributos := regexp.MustCompile(`(-|>)(\w+)(?:="([^"]+)"|=(-?/?\w+(?:/[\w.-]+)*))?`).FindAllStringSubmatch(x, -1)

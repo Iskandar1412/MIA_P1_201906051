@@ -206,7 +206,7 @@ func MOUNT_EXECUTE(_driveletter byte, _name []byte) {
 					return
 				}
 				contador += 1
-				continue
+
 			}
 		}
 		numero = contador
@@ -221,7 +221,7 @@ func MOUNT_EXECUTE(_driveletter byte, _name []byte) {
 	arr_partition = append(arr_partition, nombre_particion_montada, ToString(_name), string(_driveletter), path)
 	Partitions_Mounted = append(Partitions_Mounted, arr_partition)
 
-	color.Magenta("Montando partición... " + nombre_particion_montada)
+	color.Magenta("Montando partición... " + nombre_particion_montada + ", de la particion: " + ToString(_name))
 
 	if reflect.TypeOf(conjunto[2]) == reflect.TypeOf(structures.EBR{}) {
 		if temp_log, ok := conjunto[2].(structures.EBR); ok {
@@ -239,6 +239,7 @@ func MOUNT_EXECUTE(_driveletter byte, _name []byte) {
 		particion.Part_id = [4]byte(nombre_bytes[:])
 		Escribir_Particion("MOUNT", path, particion, conjunto[1].(int32))
 		if particion.Part_type == 'E' {
+			color.Cyan("Particion Extendida a montar")
 			return
 		}
 	}
@@ -607,6 +608,7 @@ func MKFS_EXECUTE(nombre string, tipo string, fs string) {
 
 	contenido_usuario := "1,G,root		\n"
 	contenido_usuario += "1,U,root		,root	,123	\n"
+	contenido_usuario = strings.ReplaceAll(contenido_usuario, "\t", "")
 
 	Crear_Archivo_Vacio("MKFS", path, "/", SupahBlock, contenido_usuario, "users.txt", 1, 1)
 }
