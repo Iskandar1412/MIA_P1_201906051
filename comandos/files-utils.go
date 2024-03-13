@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/fatih/color"
@@ -292,4 +293,78 @@ func Recalcular_Size_Carpetas(comando string, id string) {
 	}
 	inodo.I_s = size_total
 	Guardar_Inodo(comando, path, superbloque.S_inode_start, inodo, 0)
+}
+
+func Crear_Ruta_Carpetas(comando string, id string, ruta string, uid_user string, uid_grupo string) bool {
+	conjunto, path, ec := Obtener_Particion_ID(id)
+	if !ec {
+		return false
+	}
+	superbloque := structures.SuperBlock{}
+
+	logica := structures.EBR{}
+	if conjunto[2] != nil {
+		if temp_log, ok := conjunto[2].(structures.EBR); ok {
+			v := reflect.ValueOf(temp_log)
+			reflect.ValueOf(&logica).Elem().Set(v)
+			conjunto[0] = nil
+			conjunto[1] = nil
+			var esb bool
+			// eslogica = true
+			superbloque, esb = Obtener_Superbloque(comando, path, ToString(logica.Name[:]))
+			if !esb {
+				color.Red("[" + comando + "]: Error al obtener superbloque")
+				return false
+			}
+		}
+	}
+
+	particion := structures.Partition{}
+	if conjunto[0] != nil {
+		if temp, ok := conjunto[0].(structures.Partition); ok {
+			v := reflect.ValueOf(temp)
+			reflect.ValueOf(&particion).Elem().Set(v)
+			var esb bool
+			// esparticion = true
+			superbloque, esb = Obtener_Superbloque(comando, path, ToString(particion.Part_name[:]))
+			if !esb {
+				color.Red("[" + comando + "]: Error al obtener superbloque")
+				return false
+			}
+			if particion.Part_type == 'E' {
+				color.Red("[MKFS]: No se puede obtener información de particion extendida")
+				return false
+			}
+		}
+	}
+
+	//separar ruta
+	ruta_separada := strings.Split(ruta, "/")
+	ruta_anterior := "/"
+	nueva_ruta := ""
+	for _, carpeta := range ruta_separada {
+		if carpeta == "" {
+			continue
+		}
+		ruta_anterior = nueva_ruta
+		if ruta_anterior == "" {
+			ruta_anterior = "/"
+		}
+		nueva_ruta += "/" + carpeta
+		ultimo_inodo_padre, _ := Encontrar_Ruta(comando, path, superbloque.S_inode_start, superbloque.S_block_start, nueva_ruta)
+		if ultimo_inodo_padre != -1 {
+			color.Red("[" + comando + "]: La ruta ya existe")
+		} else {
+			color.Blue("No se encontró carpeta... " + carpeta + " [Creando...] ")
+			iuid, _ := strconv.Atoi(uid_user)
+			iuig, _ := strconv.Atoi(uid_grupo)
+			//crear_estructura_carpeta_nueva
+			if !Crear_Estructura_Carpeta_Nueva(comando, path, superbloque.S_inode_start, superbloque.S_block_start, superbloque.S_inodes_count, superbloque.S_blocks_count, ruta_anterior, carpeta, superbloque.S_bm_inode_start, superbloque.S_bm_block_start, int32(iuid), int32(iuig)) {
+				// color.Red("Error al crear carpeta")
+				return false
+			}
+			// color.Blue("Creando Archivo")
+		}
+	}
+	return true
 }

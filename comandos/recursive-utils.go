@@ -268,6 +268,29 @@ func Recalcular_Size_Carpetas_Recursivo(comando string, id string, num_inodo int
 						}
 					}
 					continue
+				} else {
+					bloque_carpeta, eba := Obtener_Bloque(comando, path, superbloque.S_block_start, apt)
+					if !eba {
+						return 0, false
+					}
+					info_carpeta := bloque_carpeta.B_content
+					if i == 0 {
+						for j := 2; j < 4; j++ {
+							info := info_carpeta[j]
+							if info.B_inodo != -1 {
+								size_total, _ := Recalcular_Size_Carpetas_Recursivo(comando, id, info.B_inodo)
+								respuesta += size_total
+							}
+						}
+					} else {
+						for j := range info_carpeta {
+							info := info_carpeta[j]
+							if info.B_inodo != -1 {
+								size_total, _ := Recalcular_Size_Carpetas_Recursivo(comando, id, info.B_inodo)
+								respuesta += size_total
+							}
+						}
+					}
 				}
 			}
 		}

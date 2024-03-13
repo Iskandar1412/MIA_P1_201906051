@@ -35,30 +35,30 @@ func Modificar_Archivo(comando string, path string, inicio_bloques int32, no_blo
 }
 
 // Creacion de archivo vacíos
-func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque structures.SuperBlock, contenido string, nombre_archivo string, id_user int32, id_group int32) {
+func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque structures.SuperBlock, contenido string, nombre_archivo string, id_user int32, id_group int32) bool {
 	numero_inodo_disponible, existe_inodo := Obtener_Inodo_Disponible(comando, path, superbloque.S_bm_inode_start, superbloque.S_inodes_count)
 	if !existe_inodo {
 		color.Red("[" + comando + "]: Error al buscar inodo")
-		return
+		return false
 	}
 	// fmt.Println(numero_inodo_disponible) //se usará luego
 
 	//información padre
 	num_inodo_padre, existe_padre := Encontrar_Ruta(comando, path, superbloque.S_inode_start, superbloque.S_block_start, ruta)
 	if !existe_padre {
-		return
+		return false
 	}
 	//inodo padre
 	inodo_padre, existe_ipadre := Obtener_Inodo(comando, path, superbloque.S_inode_start, num_inodo_padre)
 	if !existe_ipadre {
-		return
+		return false
 	}
 
 	validacion := Validar_Permisos(comando, inodo_padre.I_uid, inodo_padre.I_gid, id_user, id_group, inodo_padre.I_perm, int32(2))
 	//fmt.Println(inodo_padre)
 	if !validacion {
 		color.Magenta("No se tienen los permisos necesarios")
-		return
+		return false
 	}
 
 	//apuntadores vacios para inodo de archivo
@@ -78,7 +78,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 		numero_bloque_disponible, existe_bloque := Obtener_Bloque_Disponible(comando, path, superbloque.S_bm_block_start, superbloque.S_blocks_count)
 		if !existe_bloque {
 			color.Red("[" + comando + "]: Erorr al buscar bloque")
-			return
+			return false
 		}
 		numember_block_disp = numero_bloque_disponible
 		Crear_Bloque_Archivo_Vacio(comando, path, superbloque.S_block_start, numero_bloque_disponible)
@@ -101,7 +101,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 				numero_bloque_disponible, existe := Obtener_Bloque_Disponible(comando, path, superbloque.S_block_start, superbloque.S_blocks_count)
 				if !existe {
 					color.Red("[" + comando + "]: Erorr al buscar bloque")
-					return
+					return false
 				}
 				numember_block_disp = numero_bloque_disponible
 				Modificar_Bitmap(comando, path, superbloque.S_bm_block_start, numero_bloque_disponible, 1)
@@ -114,7 +114,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 					if bloqueApuntadores.B_pointers[contador] != int32(-1) { //caso que ya tiene un apuntador apuntando a algo
 						bloque_apuntador1, esta := Obtener_Bloque_Apuntador(comando, path, superbloque.S_block_start, bloqueApuntadores.B_pointers[contador])
 						if !esta {
-							return
+							return false
 						}
 						// bloqueApuntadores = bloque_apuntador1
 						lista_apt1 := bloque_apuntador1.B_pointers
@@ -136,7 +136,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 						//apuntador indirecto simple
 						num_bloque_apuntador, eba := Obtener_Bloque_Disponible(comando, path, superbloque.S_bm_block_start, superbloque.S_blocks_count)
 						if !eba {
-							return
+							return false
 						}
 						Crear_Bloque_Apuntador_Vacio(comando, path, superbloque.S_block_start, num_bloque_apuntador)
 						Modificar_Bitmap(comando, path, superbloque.S_bm_block_start, num_bloque_apuntador, 1)
@@ -157,7 +157,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 					if bloqueApuntadores.B_pointers[contador] != -1 {
 						bloque_apuntador1, eba := Obtener_Bloque_Apuntador(comando, path, superbloque.S_block_start, bloqueApuntadores.B_pointers[contador])
 						if !eba {
-							return
+							return false
 						}
 						lista_apt1 := bloque_apuntador1.B_pointers
 						for a := range lista_apt1 {
@@ -167,7 +167,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 							if a == 0 && !apt2lleno {
 								bloque_apuntador2, eba2 := Obtener_Bloque_Apuntador(comando, path, superbloque.S_block_start, lista_apt1[a])
 								if !eba2 {
-									return
+									return false
 								}
 								lista_apt2 := bloque_apuntador2.B_pointers
 								//lista apt2 = bloque_apuntador2.B_pointers
@@ -208,7 +208,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 						//apuntador 1
 						num_bloque_apuntador, nba := Obtener_Bloque_Disponible(comando, path, superbloque.S_bm_block_start, superbloque.S_blocks_count)
 						if !nba {
-							return
+							return false
 						}
 						Crear_Bloque_Apuntador_Vacio(comando, path, superbloque.S_block_start, num_bloque_apuntador)
 						Modificar_Bitmap(comando, path, superbloque.S_bm_block_start, num_bloque_apuntador, 1)
@@ -216,7 +216,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 						//creacion apuntador 2
 						num_bloque_apuntador2, nba2 := Obtener_Bloque_Disponible(comando, path, superbloque.S_bm_block_start, superbloque.S_blocks_count)
 						if !nba2 {
-							return
+							return false
 						}
 						Crear_Bloque_Apuntador_Vacio(comando, path, superbloque.S_block_start, num_bloque_apuntador2)
 						Modificar_Bitmap(comando, path, superbloque.S_bm_block_start, num_bloque_apuntador2, 1)
@@ -250,7 +250,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 						//caso de apuntador ya creado
 						bloque_apuntador_1, eba1 := Obtener_Bloque_Apuntador(comando, path, superbloque.S_block_start, bloqueApuntadores.B_pointers[contador])
 						if !eba1 {
-							return
+							return false
 						}
 						lista_apt1 := bloque_apuntador_1.B_pointers
 						for a := range lista_apt1 {
@@ -261,7 +261,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 							if a == 0 && !apt2lleno {
 								bloque_apuntador2, eba2 := Obtener_Bloque_Apuntador(comando, path, superbloque.S_block_start, apt1)
 								if !eba2 {
-									return
+									return false
 								}
 								lista_apt2 := bloque_apuntador2.B_pointers
 								for b := range lista_apt2 {
@@ -269,7 +269,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 									if b == 0 && !apt3lleno {
 										bloque_apuntador3, eba3 := Obtener_Bloque_Apuntador(comando, path, superbloque.S_block_start, apt2)
 										if !eba3 {
-											return
+											return false
 										}
 										lista_apt3 := bloque_apuntador3.B_pointers
 										for c := range lista_apt3 {
@@ -324,7 +324,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 						//apuntador 1
 						num_bloque_apuntador, enba := Obtener_Bloque_Disponible(comando, path, superbloque.S_bm_block_start, superbloque.S_blocks_count)
 						if !enba {
-							return
+							return false
 						}
 						Crear_Bloque_Apuntador_Vacio(comando, path, superbloque.S_block_start, num_bloque_apuntador)
 						Modificar_Bitmap(comando, path, superbloque.S_bm_block_start, num_bloque_apuntador, 1)
@@ -332,7 +332,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 
 						num_bloque_apuntador2, eba2 := Obtener_Bloque_Disponible(comando, path, superbloque.S_bm_block_start, superbloque.S_blocks_count)
 						if !eba2 {
-							return
+							return false
 						}
 						Crear_Bloque_Apuntador_Vacio(comando, path, superbloque.S_block_start, num_bloque_apuntador2)
 						Modificar_Bitmap(comando, path, superbloque.S_bm_block_start, num_bloque_apuntador2, 1)
@@ -340,7 +340,7 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 						//apuntador 3
 						num_bloque_apuntador3, eba3 := Obtener_Bloque_Disponible(comando, path, superbloque.S_bm_block_start, superbloque.S_blocks_count)
 						if !eba3 {
-							return
+							return false
 						}
 						Crear_Bloque_Apuntador_Vacio(comando, path, superbloque.S_block_start, num_bloque_apuntador3)
 						Modificar_Bitmap(comando, path, superbloque.S_bm_block_start, num_bloque_apuntador3, 1)
@@ -404,18 +404,19 @@ func Crear_Archivo_Vacio(comando string, path string, ruta string, superbloque s
 	inodo.I_type = int32(1)
 	inodo.I_perm = int32(664)
 
-	err_g_inodo := Guardar_Inodo(comando, path, superbloque.S_inode_start, inodo, numero_inodo_disponible)
-	if !err_g_inodo {
+	if !Guardar_Inodo(comando, path, superbloque.S_inode_start, inodo, numero_inodo_disponible) {
 		color.Red("No se pudo guardar el inodo")
-		return
+		return false
 	}
 
 	Modificar_Bitmap(comando, path, superbloque.S_bm_inode_start, numero_inodo_disponible, 1)
-	Agregar_Bloque_Lista_Inodos(comando, path, superbloque.S_block_start, numero_inodo_disponible, superbloque.S_bm_block_start, superbloque.S_blocks_count, nombre_archivo, inodo_padre, superbloque.S_inode_start, num_inodo_padre, superbloque.S_bm_inode_start, numember_block_disp)
+	return Agregar_Bloque_Lista_Inodos(comando, path, superbloque.S_block_start, numero_inodo_disponible, superbloque.S_bm_block_start, superbloque.S_blocks_count, nombre_archivo, inodo_padre, superbloque.S_inode_start, num_inodo_padre, superbloque.S_bm_inode_start, numember_block_disp)
+
 }
 
 func Modificar_Contenido_Archivo(comando string, id string, ruta string, contenido_nuevo string) {
-	numero_bloque_crear_nuevo := float64(len(contenido_nuevo)) / float64(64)
+	numero_len := len(contenido_nuevo)
+	numero_bloque_crear_nuevo := float64(numero_len) / float64(64)
 	if numero_bloque_crear_nuevo > 106 {
 		color.Red("Contenido exede límite de caracteres")
 		return
@@ -811,7 +812,7 @@ func Modificar_Contenido_Archivo(comando string, id string, ruta string, conteni
 			size_cadena_anterior := 0
 			agrego_bloque_nuevo_a := false
 			for i := 0; i < len(contenido_nuevo); i++ {
-				if len(cadena) == 64 || i == len(contenido_nuevo) {
+				if len(cadena) == 64 || i == len(contenido_nuevo)-1 {
 					if (i == (len(contenido_nuevo))-1) && (len(cadena) != 64) {
 						cadena += string(contenido_nuevo[i])
 						size_cadena_anterior += 1
@@ -1269,7 +1270,7 @@ func Modificar_Contenido_Archivo(comando string, id string, ruta string, conteni
 											if apt2 == -1 {
 												lista_apt2[b] = numero_bloque_disponible
 												lista_a := structures.BloqueApuntadores{B_pointers: lista_apt2}
-												Modificar_Apuntador(comando, path, superbloque.S_block_start, apt1, lista_a)
+												Modificar_Apuntador(comando, path, superbloque.S_block_start, apt2, lista_a)
 												Modificar_Bitmap(comando, path, superbloque.S_bm_block_start, numero_bloque_disponible, 1)
 												agrego = true
 												break
@@ -1381,7 +1382,7 @@ func Modificar_Contenido_Archivo(comando string, id string, ruta string, conteni
 		if !igno {
 			return
 		}
-		color.Green("Modificado G")
+		color.Green("Modificando Archivo...")
 	} else {
 		color.Red("No existe el archivo en la ruta")
 		return

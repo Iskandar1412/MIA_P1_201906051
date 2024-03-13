@@ -36,23 +36,41 @@ func UserComanmandProps(command string, instructions []string) {
 func GroupCommandProps(group string, instructions []string) {
 	var _name string //mkgrp rmgrp
 	var er bool
+	var _user string //mkusr rmusr
+	var _pass string //mkusr
+	var _grp string  //mkusr
 	/*
-		var _user string //mkusr rmusr
-		var _pass string //mkusr
-		var _grp string  //mkusr
-	*/
+	 */
 	if strings.ToUpper(group) == "MKGRP" {
-		_name, er = Values_MKGRP(instructions)
+		_user, er = Values_MKGRP(instructions)
 		if !er {
 			color.Red("[MKGRP]: Error to assing values")
 		} else {
-			MKGRP_EXECUTE(_name)
+			MKGRP_EXECUTE(_user)
 		}
 	} else if strings.ToUpper(group) == "RMGRP" {
-		fmt.Println("Eliminando Grupo")
+		_name, er = Values_RMGRP(instructions)
+		if !er {
+			color.Red("[RMGRP]: Error to assing values")
+		} else {
+			RMGRP_EXECUTE(_name)
+		}
 	} else if strings.ToUpper(group) == "MKUSR" {
-		fmt.Println("Crear usuario en particion")
+		_name, _pass, _grp, er = Values_MKUSR(instructions)
+		if !er {
+			color.Red("[MKUSR]: Error to asign values")
+		} else {
+			// fmt.Println(_name, _pass, _grp, er)
+			MKUSR_EXECUTE(_name, _pass, _grp)
+		}
+
 	} else if strings.ToUpper(group) == "RMUSR" {
+		_name, er := Values_RMUSR(instructions)
+		if !er {
+			color.Red("[RMUSR]: Error to asign values")
+		} else {
+			RMUSR_EXECUTE(_name)
+		}
 		fmt.Println("Eliminando usuario en la parcicion")
 	} else {
 		color.Red("[GroupCommandProps]: Internal Error")

@@ -2,11 +2,11 @@
 # execute -path=Pruebas/prueba.adsj
 
 #Disco 1
-#MKdisK -Size=10 -unit=M -fit=bF
+#MKdisK -Size=15 -unit=M -fit=bF
 #fdisk -name=Parte2 -driveletter=A -size=4 -unit=M -type=E
-#Fdisk -name="Part1" -driveletter=A -size=2 -type=P  #-delete=FULL
-#Fdisk -name="Part3" -driveletter=A -size=400 -type=P 
-#Fdisk -name="Part5" -driveletter=A -size=241 -type=P 
+#Fdisk -name="Part1" -driveletter=A -size=2 -unit=M -type=P  #-delete=FULL
+#Fdisk -name="Part3" -driveletter=A -size=600 -type=P 
+#Fdisk -name="Part5" -driveletter=A -size=800 -type=P 
 #fdisk -driveletter=A -size=12 -name=asdf -type=L
 #fdisk -driveletter=A -size=12 -name=asdf -type=L
 #fdisk -driveletter=A -size=450 -unit=k -name=donce -type=L
@@ -47,7 +47,23 @@ mkfs -id=A251 -fs=3fs -type=full
 
 login -user=root -pass=123 -id=A251
 mkgrp -name=grupoB
+mkgrp -name=grupoC
+rmgrp -name=grupoC
+mkusr -user=super -pass=123 -grp=grupoB
+mkusr -user=iskandar -pass=123 -grp=grupoB
+rmusr -user=super
+#mkusr -user=kim -pass=123 -grp=grupoB
 logout
-mkgrp -name=grupoA
+login -user=iskandar -pass=123 -id=A251
+mkfile -size=15 -path=/home/user/docs/a.txt -r
+mkfile -path=/home/user/docs/a.txt -r -cont=a.txt
 
-#rep -driveletter=A
+#mkgrp -name=grupoA
+
+rep -id=A251 -path=MIA/P1/Reports/imagen1.jpg -name=mbr
+rep -id=A251 -path=MIA/P1/Reports/imagen2.jpg -name=disk
+rep -id=A251 -path=MIA/P1/Reports/imagen3.jpg -name=inode
+rep -id=A251 -path=MIA/P1/Reports/imagen4.jpg -name=sb
+rep -id=A251 -path=MIA/P1/Reports/imagen5.jpg -name=block
+rep -id=A251 -path=MIA/P1/Reports/bminodes.txt -name=bm_inode
+rep -id=A251 -path=MIA/P1/Reports/bmblocks.txt -name=bm_block

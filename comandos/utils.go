@@ -399,26 +399,52 @@ func TienePassword(comando string, valor string) string {
 
 }
 
-func TieneGRP(comando string, valor string) {
+func TieneGRP(comando string, valor string) string {
 	if !strings.HasPrefix(strings.ToLower(valor), "grp=") {
 		color.Red("[" + comando + "]: No tiene grp o tiene un valor no valido")
-		return
+		return ""
 	}
+	value := strings.Split(valor, "=")
+	if len(value) < 2 {
+		color.Red("[" + comando + "]: No tiene grp Valido")
+		return ""
+	}
+	return value[1]
 
 }
 
-func TientPath(comando string, valor string) {
+func TienePathV2(comando string, valor string) string {
 	if !strings.HasPrefix(strings.ToLower(valor), "path=") {
 		color.Red("[" + comando + "]: No tiene path o tiene un valor no valido")
-		return
+		return ""
 	}
+	value := strings.Split(valor, "=")
+	if len(value) < 2 {
+		color.Red("[" + comando + "]: No tiene grp Valido")
+		return ""
+	}
+	return value[1]
 }
 
-func TieneCont(comando string, valor string) {
+func TieneCont(comando string, valor string) string {
 	if !strings.HasPrefix(strings.ToLower(valor), "cont=") {
 		color.Red("[" + comando + "]: No tiene cont o tiene un valor no valido")
-		return
+		return ""
 	}
+	value := strings.Split(valor, "=")
+	if len(value) < 2 {
+		color.Red("[" + comando + "]: No tiene grp Valido")
+		return ""
+	}
+	return value[1]
+}
+
+func TieneR(comando string, valor string) bool {
+	if !strings.HasPrefix(strings.ToLower(valor), "r") {
+		color.Red("[" + comando + "]: No tiene r o tiene un valor no valido")
+		return false
+	}
+	return true
 }
 
 func TieneCat(comando string, valor string) {
@@ -427,4 +453,22 @@ func TieneCat(comando string, valor string) {
 		color.Red("[" + comando + "]: No tiene fileN o tiene un valor no valido")
 		return
 	}
+}
+
+func TieneSizeV2(comando string, valor string) int32 {
+	if !strings.HasPrefix(strings.ToLower(valor), "size=") {
+		color.Red("[" + comando + "]: No tiene size o tiene un valor no valido")
+		return -1
+	}
+	value := strings.Split(valor, "=")
+	i, err := strconv.Atoi(value[1])
+	if err != nil {
+		fmt.Println("Error conversion", err)
+		return -1
+	}
+	if i < 0 {
+		color.Red("[" + comando + "]: No tiene size Valido")
+		return -1
+	}
+	return int32(i)
 }

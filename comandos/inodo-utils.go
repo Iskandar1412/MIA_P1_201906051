@@ -77,7 +77,7 @@ func Guardar_Inodo(comando string, path string, inicio int32, inodo structures.I
 	return true
 }
 
-func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int32, numero_inodo_disponible int32, inicio_bitmap_bloque int32, numero_bloques_total int32, nombre_carpeta string, inodo_padre structures.Inode, inicio_inodo int32, numero_inodo_padre int32, inicio_bitmap_inodo int32, numero_bloque_disponible int32) {
+func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int32, numero_inodo_disponible int32, inicio_bitmap_bloque int32, numero_bloques_total int32, nombre_carpeta string, inodo_padre structures.Inode, inicio_inodo int32, numero_inodo_padre int32, inicio_bitmap_inodo int32, numero_bloque_disponible int32) bool {
 	apuntadores_padre := inodo_padre.I_block
 	contenido_vacio := structures.Content{B_name: NameArchivosByte(""), B_inodo: int32(-1)}
 	contador := 0
@@ -86,7 +86,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 			if contador == 13 {
 				bloque_apt, eba := Obtener_Bloque_Apuntador(comando, path, inicio_bloque, apuntadores)
 				if !eba {
-					return
+					return false
 				}
 				lista_apt := bloque_apt.B_pointers
 				for i := range lista_apt {
@@ -94,7 +94,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 					if apt != -1 {
 						bloque_padre, ebp := Obtener_Bloque(comando, path, inicio_bloque, apt)
 						if !ebp {
-							return
+							return false
 						}
 						lista_bloque_padre := bloque_padre.B_content
 						for _, apt_bloque_padre := range lista_bloque_padre {
@@ -110,7 +110,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 								lista_enviar = append(lista_enviar, lista_bloque_padre[3])
 
 								Modificar_Carpeta(comando, path, inicio_bloque, apt, lista_enviar)
-								return
+								return true
 							}
 						}
 					} else {
@@ -122,7 +122,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 						contenido_carpeta = append(contenido_carpeta, contenido_vacio)
 						nuevo_bloque_padre, enbp := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 						if !enbp {
-							return
+							return false
 						}
 						Crear_Bloque_Carpeta_Vacio(comando, path, inicio_bloque, nuevo_bloque_padre)
 						Modificar_Carpeta(comando, path, inicio_bloque, nuevo_bloque_padre, contenido_carpeta)
@@ -132,7 +132,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 						lista_apt[i] = nuevo_bloque_padre
 						lista_a := structures.BloqueApuntadores{B_pointers: lista_apt}
 						Modificar_Apuntador(comando, path, inicio_bloque, apuntadores, lista_a)
-						return
+						return true
 					}
 				}
 				contador += 1
@@ -140,7 +140,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 			} else if contador == 14 {
 				bloque_apt, eba := Obtener_Bloque_Apuntador(comando, path, inicio_bloque, apuntadores)
 				if !eba {
-					return
+					return false
 				}
 				lista_apt := bloque_apt.B_pointers
 				for i := range lista_apt {
@@ -149,7 +149,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 						if i == 0 {
 							bloque_apt2, eba2 := Obtener_Bloque_Apuntador(comando, path, inicio_bloque, apt)
 							if !eba2 {
-								return
+								return false
 							}
 							lista_apt2 := bloque_apt2.B_pointers
 							for j := range lista_apt2 {
@@ -157,7 +157,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 								if apt2 != -1 {
 									bloque_padre, ebp := Obtener_Bloque(comando, path, inicio_bloque, apt2)
 									if !ebp {
-										return
+										return false
 									}
 									lista_bloque_padre := bloque_padre.B_content
 									for _, apt_bloque_padre := range lista_bloque_padre {
@@ -173,7 +173,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 											lista_enviar = append(lista_enviar, lista_bloque_padre[3])
 
 											Modificar_Carpeta(comando, path, inicio_bloque, apt2, lista_enviar)
-											return
+											return true
 										}
 									}
 								} else {
@@ -185,7 +185,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 									contenido_carpeta = append(contenido_carpeta, contenido_vacio)
 									nuevo_bloque_padre, enbp := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 									if !enbp {
-										return
+										return false
 									}
 									Crear_Bloque_Carpeta_Vacio(comando, path, inicio_bloque, nuevo_bloque_padre)
 									Modificar_Carpeta(comando, path, inicio_bloque, nuevo_bloque_padre, contenido_carpeta)
@@ -195,14 +195,14 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 									lista_apt2[j] = nuevo_bloque_padre
 									lista_a := structures.BloqueApuntadores{B_pointers: lista_apt2}
 									Modificar_Apuntador(comando, path, inicio_bloque, apuntadores, lista_a)
-									return
+									return true
 								}
 							}
 							continue
 						}
 						bloque_padre, ebp := Obtener_Bloque(comando, path, inicio_bloque, apt)
 						if !ebp {
-							return
+							return false
 						}
 						lista_bloque_padre := bloque_padre.B_content
 						for _, apt_bloque_padre := range lista_bloque_padre {
@@ -218,7 +218,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 								lista_enviar = append(lista_enviar, lista_bloque_padre[3])
 
 								Modificar_Carpeta(comando, path, inicio_bloque, apt, lista_enviar)
-								return
+								return true
 							}
 						}
 					} else {
@@ -230,7 +230,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 						contenido_carpeta = append(contenido_carpeta, contenido_vacio)
 						nuevo_bloque_padre, enbp := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 						if !enbp {
-							return
+							return false
 						}
 						Crear_Bloque_Carpeta_Vacio(comando, path, inicio_bloque, nuevo_bloque_padre)
 						Modificar_Carpeta(comando, path, inicio_bloque, nuevo_bloque_padre, contenido_carpeta)
@@ -240,7 +240,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 						lista_apt[i] = nuevo_bloque_padre
 						lista_a := structures.BloqueApuntadores{B_pointers: lista_apt}
 						Modificar_Apuntador(comando, path, inicio_bloque, apuntadores, lista_a)
-						return
+						return true
 					}
 				}
 				contador += 1
@@ -249,7 +249,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 				//apuntador triple
 				bloque_apt, eba := Obtener_Bloque_Apuntador(comando, path, inicio_bloque, apuntadores)
 				if !eba {
-					return
+					return false
 				}
 				lista_apt := bloque_apt.B_pointers
 				for i := range lista_apt {
@@ -258,7 +258,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 						if i == 0 {
 							bloque_apt2, eba2 := Obtener_Bloque_Apuntador(comando, path, inicio_bloque, apt)
 							if !eba2 {
-								return
+								return false
 							}
 							lista_apt2 := bloque_apt2.B_pointers
 							for j := range lista_apt2 {
@@ -267,7 +267,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 									if j == 0 {
 										bloque_apt3, eba3 := Obtener_Bloque_Apuntador(comando, path, inicio_bloque, apt2)
 										if !eba3 {
-											return
+											return false
 										}
 										lista_apt3 := bloque_apt3.B_pointers
 										for k := range lista_apt3 {
@@ -275,7 +275,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 											if apt3 != -1 {
 												bloque_padre, ebp3 := Obtener_Bloque(comando, path, inicio_bloque, apt3)
 												if !ebp3 {
-													return
+													return false
 												}
 												lista_bloque_padre := bloque_padre.B_content
 												for _, apt_bloque_padre := range lista_bloque_padre {
@@ -291,7 +291,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 														lista_enviar = append(lista_enviar, lista_bloque_padre[3])
 
 														Modificar_Carpeta(comando, path, inicio_bloque, apt3, lista_enviar)
-														return
+														return true
 													}
 												}
 											} else {
@@ -303,7 +303,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 												contenido_carpeta = append(contenido_carpeta, contenido_vacio)
 												nuevo_bloque_padre, enbp := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 												if !enbp {
-													return
+													return false
 												}
 												Crear_Bloque_Carpeta_Vacio(comando, path, inicio_bloque, nuevo_bloque_padre)
 												Modificar_Carpeta(comando, path, inicio_bloque, nuevo_bloque_padre, contenido_carpeta)
@@ -313,13 +313,13 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 												lista_apt3[k] = nuevo_bloque_padre
 												lista_a := structures.BloqueApuntadores{B_pointers: lista_apt3}
 												Modificar_Apuntador(comando, path, inicio_bloque, apuntadores, lista_a)
-												return
+												return true
 											}
 										}
 									}
 									bloque_padre, ebp := Obtener_Bloque(comando, path, inicio_bloque, apt2)
 									if !ebp {
-										return
+										return false
 									}
 									lista_bloque_padre := bloque_padre.B_content
 									for _, apt_bloque_padre := range lista_bloque_padre {
@@ -335,7 +335,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 											lista_enviar = append(lista_enviar, lista_bloque_padre[3])
 
 											Modificar_Carpeta(comando, path, inicio_bloque, apt2, lista_enviar)
-											return
+											return true
 										}
 									}
 								} else {
@@ -347,7 +347,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 									contenido_carpeta = append(contenido_carpeta, contenido_vacio)
 									nuevo_bloque_padre, enbp := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 									if !enbp {
-										return
+										return false
 									}
 									Crear_Bloque_Carpeta_Vacio(comando, path, inicio_bloque, nuevo_bloque_padre)
 									Modificar_Carpeta(comando, path, inicio_bloque, nuevo_bloque_padre, contenido_carpeta)
@@ -357,14 +357,14 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 									lista_apt2[j] = nuevo_bloque_padre
 									lista_a := structures.BloqueApuntadores{B_pointers: lista_apt2}
 									Modificar_Apuntador(comando, path, inicio_bloque, apuntadores, lista_a)
-									return
+									return true
 								}
 							}
 							continue
 						}
 						bloque_padre, ebp := Obtener_Bloque(comando, path, inicio_bloque, apt)
 						if !ebp {
-							return
+							return false
 						}
 						lista_bloque_padre := bloque_padre.B_content
 						for _, apt_bloque_padre := range lista_bloque_padre {
@@ -380,7 +380,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 								lista_enviar = append(lista_enviar, lista_bloque_padre[3])
 
 								Modificar_Carpeta(comando, path, inicio_bloque, apt, lista_enviar)
-								return
+								return true
 							}
 						}
 					} else {
@@ -392,7 +392,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 						contenido_carpeta = append(contenido_carpeta, contenido_vacio)
 						nuevo_bloque_padre, enbp := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 						if !enbp {
-							return
+							return false
 						}
 						Crear_Bloque_Carpeta_Vacio(comando, path, inicio_bloque, nuevo_bloque_padre)
 						Modificar_Carpeta(comando, path, inicio_bloque, nuevo_bloque_padre, contenido_carpeta)
@@ -402,18 +402,18 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 						lista_apt[i] = nuevo_bloque_padre
 						lista_a := structures.BloqueApuntadores{B_pointers: lista_apt}
 						Modificar_Apuntador(comando, path, inicio_bloque, apuntadores, lista_a)
-						return
+						return true
 					}
 				}
 				contador += 1
 				if contador == 16 {
 					color.Yellow("No hay más espacio en inodo")
-					return
+					return false
 				}
 			} else {
 				bloque_padre, ebp := Obtener_Bloque(comando, path, inicio_bloque, apuntadores)
 				if !ebp {
-					return
+					return false
 				}
 				lista_bloque_padre := bloque_padre.B_content
 
@@ -429,7 +429,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 						lista_enviar = append(lista_enviar, lista_bloque_padre[2])
 						lista_enviar = append(lista_enviar, lista_bloque_padre[3])
 						Modificar_Carpeta(comando, path, inicio_bloque, apuntadores, lista_enviar)
-						return
+						return true
 					}
 				}
 			}
@@ -437,7 +437,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 			if contador == 13 {
 				num_bloque_apuntador, enba := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 				if !enba {
-					return
+					return false
 				}
 				Crear_Bloque_Apuntador_Vacio(comando, path, inicio_bloque, num_bloque_apuntador)
 				Modificar_Bitmap(comando, path, inicio_bitmap_bloque, num_bloque_apuntador, 1)
@@ -451,7 +451,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 
 				nuevo_bloque_padre, enbp := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 				if !enbp {
-					return
+					return false
 				}
 				Crear_Bloque_Carpeta_Vacio(comando, path, inicio_bloque, nuevo_bloque_padre)
 				Modificar_Carpeta(comando, path, inicio_bloque, nuevo_bloque_padre, contenido_carpeta)
@@ -467,7 +467,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 
 				err_in_pad := Guardar_Inodo(comando, path, inicio_inodo, inodo_padre, numero_inodo_padre)
 				if !err_in_pad {
-					return
+					return false
 				}
 
 				//apuntar a carpeta
@@ -479,12 +479,12 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 
 				// lista_a := apuntadores
 				Modificar_Apuntador(comando, path, inicio_bloque, num_bloque_apuntador, lista_apt_apuntadores)
-				return
+				return true
 			} else if contador == 14 {
 				//indirecto doble
 				num_bloque_apuntador, enba := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 				if !enba {
-					return
+					return false
 				}
 				Crear_Bloque_Apuntador_Vacio(comando, path, inicio_bloque, num_bloque_apuntador)
 				Modificar_Bitmap(comando, path, inicio_bitmap_bloque, num_bloque_apuntador, 1)
@@ -492,7 +492,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 				//apuntador 2
 				num_bloque_apuntador2, enba2 := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 				if !enba2 {
-					return
+					return false
 				}
 				Crear_Bloque_Apuntador_Vacio(comando, path, inicio_bloque, num_bloque_apuntador2)
 				Modificar_Bitmap(comando, path, inicio_bitmap_bloque, num_bloque_apuntador2, 1)
@@ -516,7 +516,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 				contenido_carpeta = append(contenido_carpeta, contenido_vacio)
 				nuevo_bloque_padre, enbp := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 				if !enbp {
-					return
+					return false
 				}
 				Crear_Bloque_Carpeta_Vacio(comando, path, inicio_bloque, nuevo_bloque_padre)
 				Modificar_Carpeta(comando, path, inicio_bloque, nuevo_bloque_padre, contenido_carpeta)
@@ -530,7 +530,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 				inodo_padre.I_mtime = fecha
 				err_in_pa := Guardar_Inodo(comando, path, inicio_inodo, inodo_padre, numero_inodo_padre)
 				if !err_in_pa {
-					return
+					return false
 				}
 
 				//apuntar a a carpeta
@@ -541,12 +541,12 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 				lista_apt_apuntadores.B_pointers[0] = nuevo_bloque_padre
 
 				Modificar_Apuntador(comando, path, inicio_bloque, num_bloque_apuntador2, lista_apt_apuntadores)
-				return
+				return true
 			} else if contador == 15 {
 				//apuntador 1
 				num_bloque_apuntador, enbc := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 				if !enbc {
-					return
+					return false
 				}
 				Crear_Bloque_Apuntador_Vacio(comando, path, inicio_bloque, num_bloque_apuntador)
 				Modificar_Bitmap(comando, path, inicio_bitmap_bloque, num_bloque_apuntador, 1)
@@ -554,7 +554,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 				//apuntador 2
 				num_bloque_apuntador2, enbc2 := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 				if !enbc2 {
-					return
+					return false
 				}
 				Crear_Bloque_Apuntador_Vacio(comando, path, inicio_bloque, num_bloque_apuntador2)
 				Modificar_Bitmap(comando, path, inicio_bitmap_bloque, num_bloque_apuntador2, 1)
@@ -562,7 +562,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 				//apuntador 3
 				num_bloque_apuntador3, enbc3 := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 				if !enbc3 {
-					return
+					return false
 				}
 				Crear_Bloque_Apuntador_Vacio(comando, path, inicio_bloque, num_bloque_apuntador3)
 				Modificar_Bitmap(comando, path, inicio_bitmap_bloque, num_bloque_apuntador3, 1)
@@ -597,7 +597,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 
 				nuevo_bloque_padre, enbp := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 				if !enbp {
-					return
+					return false
 				}
 				Crear_Bloque_Carpeta_Vacio(comando, path, inicio_bloque, nuevo_bloque_padre)
 				Modificar_Carpeta(comando, path, inicio_bloque, nuevo_bloque_padre, contenido_carpeta)
@@ -621,7 +621,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 
 				Modificar_Apuntador(comando, path, inicio_bloque, num_bloque_apuntador3, lista_apt_apuntadores)
 
-				return
+				return true
 			} else {
 				//crear un nuevo espacio
 				//no hay más apuntadores llenos y hay que crear un bloque nuevo para almacenar la carpeta
@@ -634,7 +634,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 
 				nuevo_bloque_padre, enbp := Obtener_Bloque_Disponible(comando, path, inicio_bitmap_bloque, numero_bloques_total)
 				if !enbp {
-					return
+					return false
 				}
 				Crear_Bloque_Carpeta_Vacio(comando, path, inicio_bloque, nuevo_bloque_padre)
 				Modificar_Carpeta(comando, path, inicio_bloque, nuevo_bloque_padre, contenido_capetas)
@@ -645,7 +645,7 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 				fecha := ObFechaInt()
 				inodo_padre.I_mtime = fecha
 				Guardar_Inodo(comando, path, inicio_inodo, inodo_padre, numero_inodo_padre)
-				return
+				return true
 			}
 		}
 		contador += 1
@@ -653,4 +653,5 @@ func Agregar_Bloque_Lista_Inodos(comando string, path string, inicio_bloque int3
 	fmt.Println("[" + comando + "]: No hay espacio")
 	Modificar_Bitmap(comando, path, inicio_bitmap_bloque, numero_bloque_disponible, 0)
 	Modificar_Bitmap(comando, path, inicio_bitmap_inodo, numero_inodo_disponible, 0)
+	return true
 }

@@ -26,7 +26,7 @@ var UsuarioLogeado = Usuario{
 
 func ObtenerComandos(x string) []string {
 	var comandos []string
-	atributos := regexp.MustCompile(`(-|>)(\w+)(?:="([^"]+)"|=(-?/?\w+(?:/[\w.-]+)*))?`).FindAllStringSubmatch(x, -1)
+	atributos := regexp.MustCompile(`(-|>)(\w+)(?:="([^"]+)"|=(-?/?\w+(?:/?[\w.-]+)*))?`).FindAllStringSubmatch(x, -1)
 	for _, matches := range atributos {
 		atributo := matches[2]
 		valorConComillas := matches[3]
