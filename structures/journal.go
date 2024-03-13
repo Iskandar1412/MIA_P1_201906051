@@ -2,6 +2,21 @@
 package structures
 
 type Journal struct { //156 bytes
+	J_state   int8
+	J_command [150]byte
+	J_date    int32
+	J_content [64]byte
+}
+
+//estado int8
+//comando 150 byte
+//horafecha int32
+//contenido 64s
+=======
+<<<<<<< HEAD
+package structures
+
+type Journal struct { //156 bytes
 	J_operation   [10]byte //operacion
 	J_content     [60]byte //contenido
 	J_permissions int32    //permisos
@@ -26,3 +41,4 @@ type Journal struct { //156 bytes
 //horafecha int32
 //contenido 64s
 >>>>>>> origin/updating-version
+>>>>>>> origin/main

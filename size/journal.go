@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> origin/main
 package size
 
 import (
@@ -7,6 +10,15 @@ import (
 )
 
 func SizeJournal() int32 { //156 bytes
+<<<<<<< HEAD
+	a01 := int32(unsafe.Sizeof(structures.Journal{}.J_state))
+	a02 := int32(unsafe.Sizeof(structures.Journal{}.J_command))
+	a03 := int32(unsafe.Sizeof(structures.Journal{}.J_date))
+	a04 := int32(unsafe.Sizeof(structures.Journal{}.J_content))
+	result := a01 + a02 + a03 + a04
+	return result
+}
+=======
 	a01 := int32(unsafe.Sizeof(structures.Journal{}.J_operation))
 	a02 := int32(unsafe.Sizeof(structures.Journal{}.J_content))
 	a03 := int32(unsafe.Sizeof(structures.Journal{}.J_permissions))
@@ -35,3 +47,4 @@ func SizeJournal() int32 { //156 bytes
 	return result
 }
 >>>>>>> origin/updating-version
+>>>>>>> origin/main
