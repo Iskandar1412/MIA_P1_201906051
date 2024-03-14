@@ -1,8 +1,10 @@
 package comandos
 
 import (
+	"MIA_P1_201906051/size"
 	"MIA_P1_201906051/structures"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/fatih/color"
@@ -127,4 +129,56 @@ func ReducirSuperBloqueObtener(upad string, id_disco string, conjunto []interfac
 		}
 	}
 	return superbloque, true
+}
+
+func Obtener_Superbloque_Journal_Reducido(upad string, id_disco string, conjunto []interface{}) (structures.SuperBlock, int32, bool) {
+	inicio_journaling := int32(-1)
+	superbloque := structures.SuperBlock{}
+
+	logica := structures.EBR{}
+	if conjunto[2] != nil {
+		if temp_log, ok := conjunto[2].(structures.EBR); ok {
+			v := reflect.ValueOf(temp_log)
+			reflect.ValueOf(&logica).Elem().Set(v)
+			var e bool
+			superbloque, e = Obtener_Superbloque("REP", upad, ToString(logica.Name[:]))
+			if !e {
+				return structures.SuperBlock{}, -1, false
+			}
+			inicio_journaling = logica.Part_start + size.SizeSuperBlock()
+		}
+		conjunto[0] = nil
+		conjunto[1] = nil
+	}
+
+	particion := structures.Partition{}
+	if conjunto[0] != nil {
+		if temp, ok := conjunto[0].(structures.Partition); ok {
+			v := reflect.ValueOf(temp)
+			reflect.ValueOf(&particion).Elem().Set(v)
+			var e bool
+			superbloque, e = Obtener_Superbloque("REP", upad, ToString(particion.Part_name[:]))
+			if !e {
+				return structures.SuperBlock{}, -1, false
+			}
+			inicio_journaling = particion.Part_start + size.SizeSuperBlock()
+		}
+	}
+
+	if inicio_journaling == superbloque.S_bm_inode_start {
+		//ext2
+		return structures.SuperBlock{}, -1, false
+	}
+
+	TamanioJournal := size.SizeJournal()
+	numero_estructuras_journaling := (superbloque.S_bm_inode_start - inicio_journaling) / (TamanioJournal)
+	if numero_estructuras_journaling > 0 {
+		return superbloque, numero_estructuras_journaling, true
+	}
+	return structures.SuperBlock{}, -1, false
+}
+
+func ToInt(v string) int32 {
+	i, _ := strconv.Atoi(v)
+	return int32(i)
 }

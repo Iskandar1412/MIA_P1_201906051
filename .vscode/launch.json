@@ -26,6 +26,14 @@
             "mode": "auto",
             "args": [],
             "program": "/home/iskandar/Escritorio/Proyectos/Git/MIA_1S2024_201906051/Proyectos/MIA_P1_201906051/comandos/disk-commands.go"
+        },
+        {
+            "type": "go",
+            "name": "debug reports-tree-utils.go",
+            "request": "launch",
+            "mode": "auto",
+            "args": [],
+            "program": "/home/iskandar/Escritorio/Proyectos/Git/MIA_1S2024_201906051/Proyectos/MIA_P1_201906051/comandos/reports-tree-utils.go"
         }
     ]
 }

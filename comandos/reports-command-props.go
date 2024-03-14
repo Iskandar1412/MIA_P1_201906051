@@ -98,7 +98,7 @@ func REP_EXECUTE(_name string, _path string, _id string, _ruta string) {
 	} else if _name == "inode" {
 		Report_INODE(nombre_archivo, ruta_sin_archivo, _ruta, _id)
 	} else if _name == "journaling" {
-
+		Report_Journal(nombre_archivo, ruta_sin_archivo, _ruta, _id)
 	} else if _name == "block" {
 		Report_BLOCK(nombre_archivo, ruta_sin_archivo, _ruta, _id)
 	} else if _name == "bm_inode" {
@@ -106,13 +106,13 @@ func REP_EXECUTE(_name string, _path string, _id string, _ruta string) {
 	} else if _name == "bm_block" {
 		Report_BM_Block(nombre_archivo, ruta_sin_archivo, _ruta, _id)
 	} else if _name == "tree" {
-
+		Report_TREE(nombre_archivo, ruta_sin_archivo, _ruta, _id)
 	} else if _name == "sb" {
 		Report_SUPERBLOCK(nombre_archivo, ruta_sin_archivo, _ruta, _id)
 	} else if _name == "file" {
 		Report_FILE(nombre_archivo, ruta_sin_archivo, _ruta, _id)
 	} else if _name == "ls" {
-
+		Report_LS(nombre_archivo, ruta_sin_archivo, _ruta, _id)
 	} else {
 		color.Red("[REP]: Internal Error")
 		return

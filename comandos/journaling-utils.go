@@ -50,7 +50,7 @@ func Obtener_Journaling(comando string, id string, numero_journaling int) (struc
 				color.Red("[" + comando + "]: Error al obtener superbloque")
 				return structures.Journal{}, false
 			}
-			inicio_particion := logica.Part_start
+			inicio_particion := particion.Part_start
 			inicio_journaling = inicio_particion + size.SizeSuperBlock()
 
 			if particion.Part_type == 'E' {
@@ -215,17 +215,17 @@ func Modificar_Journaling(comando string, id string, numero_journaling int32, jo
 	file, err := os.OpenFile(path, os.O_RDWR, 0666)
 	if err != nil {
 		color.Red("[" + comando + "]: Error al leer Archivo")
-		return 
+		return
 	}
 	defer file.Close()
 	if _, err := file.Seek(int64(ubicabion_journaling), 0); err != nil {
 		color.Red("[" + comando + "]: Error al mover el puntero")
-		return 
+		return
 	}
 
-	if err := binary.Write(file, binary.LittleEndian, &journaling); err!= nil {
-        color.Red("[" + comando + "]: Error en escritura de Journal")
-        return
-    }
+	if err := binary.Write(file, binary.LittleEndian, &journaling); err != nil {
+		color.Red("[" + comando + "]: Error en escritura de Journal")
+		return
+	}
 	color.Green("[" + comando + "]: Journal modificado")
 }

@@ -278,5 +278,5 @@ func Report_BM_Block(name string, path string, ruta string, id_disco string) {
 			contador = 0
 		}
 	}
-	color.Green("Report Generate [bm_inode]")
+	color.Green("Report Generate [bm_block]")
 }
