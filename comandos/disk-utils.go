@@ -146,7 +146,7 @@ func BuscarParticion(disco structures.MBR, nombre []byte, path string) ([]interf
 	ebr_anterior_data := structures.EBR{Part_mount: int8(-1), Part_fit: 'W', Part_start: int32(-1), Part_s: int32(-1), Part_next: int32(-1), Name: DevolverNombreByte("-1")}
 	for {
 		if siguiente == -1 {
-			color.Magenta("[MOUNT]: No hay particion lógica con ese nombre")
+			color.Magenta("[MOUNT]: No hay particion lógica con ese nombre ->>" + ToString(nombre[:]))
 			Devolucion[0] = nil
 			Devolucion[1] = nil
 			return Devolucion, true
@@ -254,7 +254,7 @@ func BuscarParticionV2(nombre []byte, path string) ([]interface{}, bool) {
 	ebr_anterior_data := structures.EBR{Part_mount: int8(-1), Part_fit: 'W', Part_start: int32(-1), Part_s: int32(-1), Part_next: int32(-1), Name: DevolverNombreByte("-1")}
 	for {
 		if siguiente == -1 {
-			color.Magenta("[MOUNT]: No hay particion lógica con ese nombre")
+			color.Magenta("[MOUNT]: No hay particion lógica con ese nombre -> " + ToString(nombre[:]))
 			Devolucion[0] = nil
 			Devolucion[1] = nil
 			return Devolucion, true

@@ -4,6 +4,7 @@ import (
 	"MIA_P1_201906051/size"
 	"MIA_P1_201906051/structures"
 	"encoding/binary"
+	"fmt"
 	"os"
 	"reflect"
 	"strconv"
@@ -353,7 +354,7 @@ func Crear_Ruta_Carpetas(comando string, id string, ruta string, uid_user string
 		nueva_ruta += "/" + carpeta
 		ultimo_inodo_padre, _ := Encontrar_Ruta(comando, path, superbloque.S_inode_start, superbloque.S_block_start, nueva_ruta)
 		if ultimo_inodo_padre != -1 {
-			color.Red("[" + comando + "]: La ruta ya existe")
+			color.Red("[" + comando + "]: La ruta ya existe ->>" + carpeta)
 		} else {
 			color.Blue("No se encontró carpeta... " + carpeta + " [Creando...] ")
 			iuid, _ := strconv.Atoi(uid_user)
@@ -367,4 +368,43 @@ func Crear_Ruta_Carpetas(comando string, id string, ruta string, uid_user string
 		}
 	}
 	return true
+}
+
+func Copiar_Archivo(id string, ruta_archivo string, destino string, nombre string, id_usuario int32, id_grupo int32, inodo structures.Inode) {
+	conjunto, route, eco := Obtener_Particion_ID(id)
+	if !eco {
+		return
+	}
+
+	superbloque, esb := ReducirSuperBloqueObtener(route, id, conjunto)
+	if !esb {
+		return
+	}
+
+	contenido_archivo, eca := Obtener_Contenido_Archivo(id, ruta_archivo, strconv.Itoa(int(id_usuario)), strconv.Itoa(int(id_grupo)))
+	if !eca {
+		return
+	}
+
+	Crear_Archivo_Vacio("", route, destino, superbloque, contenido_archivo, nombre, id_usuario, id_grupo)
+	numero_inodo_nuevo, enin := Encontrar_Ruta_Sin_Path("", id, destino+nombre)
+	if !enin {
+		return
+	}
+	inodo_nuevo, ein := Obtener_Inodo("", route, superbloque.S_inode_start, numero_inodo_nuevo)
+	if !ein {
+		return
+	}
+
+	fecha := ObFechaInt()
+	inodo_nuevo.I_uid = id_usuario
+	inodo_nuevo.I_gid = id_grupo
+	inodo_nuevo.I_s = inodo.I_s
+	inodo_nuevo.I_atime = fecha
+	inodo_nuevo.I_ctime = fecha
+	inodo_nuevo.I_mtime = fecha
+	inodo_nuevo.I_type = inodo.I_type
+	inodo_nuevo.I_perm = inodo.I_perm
+	Guardar_Inodo("", route, superbloque.S_inode_start, inodo_nuevo, numero_inodo_nuevo)
+	fmt.Println("Archivo copiado exitosamente")
 }

@@ -12,9 +12,10 @@ func Values_LOGIN(instructions []string) (Usuario, bool) {
 	var _uss string
 	var _pas string
 	var _id string
-	UsuarioLogeado.Id_Particion = IDParticionByte("")
-	UsuarioLogeado.User = NameArchivosByte("")
-	UsuarioLogeado.Password = NameArchivosByte("")
+	// UsuarioLogeado.Id_Particion = IDParticionByte("")
+	// UsuarioLogeado.User = NameArchivosByte("")
+	// UsuarioLogeado.Password = NameArchivosByte("")
+	usuario := Usuario{}
 
 	for _, valor := range instructions {
 		if strings.HasPrefix(strings.ToLower(valor), "id") {
@@ -34,19 +35,24 @@ func Values_LOGIN(instructions []string) (Usuario, bool) {
 		}
 	}
 	if _id == "" || len(_id) == 0 || len(_id) > 4 {
-		return UsuarioLogeado, false
+		return usuario, false
 	} else if _pas == "" || len(_pas) == 0 || len(_pas) > 10 {
-		return UsuarioLogeado, false
+		return usuario, false
 	} else if _uss == "" || len(_uss) == 0 || len(_uss) > 10 {
-		return UsuarioLogeado, false
+		return usuario, false
 	}
-	UsuarioLogeado.Id_Particion = IDParticionByte(_id)
-	UsuarioLogeado.User = NameArchivosByte(_uss)
-	UsuarioLogeado.Password = NameArchivosByte(_pas)
-	return UsuarioLogeado, true
+	usuario.Id_Particion = IDParticionByte(_id)
+	usuario.User = NameArchivosByte(_uss)
+	usuario.Password = NameArchivosByte(_pas)
+	return usuario, true
 }
 
 func LOGIN_EXECUTE(uss string, password string, id_disco string) {
+	if ToString(UsuarioLogeado.User[:]) != "" {
+		color.Red("[LOGIN]: Error de inicio de seción, ya hay otro usuario")
+		return
+	}
+
 	contenido_users, ecu := Obtener_Contenido_Archivo_Users("LOGIN", id_disco)
 	if !ecu {
 		return
@@ -87,10 +93,11 @@ func LOGIN_EXECUTE(uss string, password string, id_disco string) {
 					Modificar_Journaling("LOGIN", id_disco, numero_journaling_disponible, journaling)
 					return
 				}
+				return
 			}
 		}
 	}
-	color.Red("[LOGIN]: Usuario incorrecto")
+	color.Red("[LOGIN]: Usuario incorrecto -> " + uss)
 }
 
 func LOGOUT_EXECUTE() {

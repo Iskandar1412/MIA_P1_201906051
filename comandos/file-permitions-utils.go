@@ -262,3 +262,52 @@ func Crear_Archivo_Vacio_Sin_Path(comando string, id string, ruta string, conten
 
 	return Crear_Archivo_Vacio(comando, path, ruta, superbloque, contenido, nombre_archivo, id_user, id_grupo)
 }
+
+func TieneFile(valor string) string {
+	value := strings.Split(valor, "=")
+	return value[1]
+}
+
+func Obtener_Contenido_Archivo_Con_Permisos(comando string, id string, ruta string, id_user int32, grupo_user int32) (string, bool) {
+
+	conjunto, path, eco := Obtener_Particion_ID(id)
+	if !eco {
+		return "", false
+	}
+
+	superbloque, esb := ReducirSuperBloqueObtener(path, id, conjunto)
+	if !esb {
+		return "", false
+	}
+
+	ruta_separada := strings.Split(ruta, "/")
+	nombre_archivo := ruta_separada[len(ruta_separada)-1]
+	ruta_sin_archivo := strings.ReplaceAll(ruta, "/"+nombre_archivo, "")
+
+	numero_inodo_carpeta, enic := Encontrar_Ruta(comando, path, superbloque.S_inode_start, superbloque.S_block_start, ruta_sin_archivo)
+	if !enic {
+		return "", false
+	}
+
+	inodo_carpeta, eic := Obtener_Inodo(comando, path, superbloque.S_inode_start, numero_inodo_carpeta)
+	if !eic {
+		return "", false
+	}
+
+	if !Validar_Permisos(comando, inodo_carpeta.I_uid, inodo_carpeta.I_gid, id_user, grupo_user, inodo_carpeta.I_perm, 4) {
+		color.Red("No se tienen permisos necesarios")
+		return "", false
+	}
+	fecha := ObFechaInt()
+	inodo_carpeta.I_atime = fecha
+	if !Guardar_Inodo(comando, path, superbloque.S_inode_start, inodo_carpeta, numero_inodo_carpeta) {
+		return "", false
+	}
+	content, econ := Obtener_Contenido_Archivo(id, ruta, strconv.Itoa(1), strconv.Itoa(1))
+	if !econ {
+		return "", false
+	}
+	return content, true
+
+	// return "", false
+}

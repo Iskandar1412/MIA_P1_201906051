@@ -66,7 +66,7 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 	//obtener disco
 	tempDisk, existe := ObtainMBRDisk(path)
 	if !existe {
-		color.Red("[FDISK]: Error al obtener el disco")
+		color.Red("[FDISK]: Error al obtener el disco -> " + string(_driveletter))
 		return
 	}
 
@@ -190,8 +190,12 @@ func FDISK_Create(_size int32, _driveletter byte, _name []byte, _unit byte, _typ
 				return
 			}
 
+			if Tamano(_size, _unit) > tempDisk.Mbr_tamano {
+				color.Magenta("[FDISK]: Error al crear la partición " + string(_name) + ", Disco insuficiente")
+				return
+			}
 			GuardarParticion(path, tempDisk)
-			color.Green("Partición " + string(_name) + " Creada Exitosamente")
+			color.Green("Partición " + string(_name) + " Creada Exitosamente -> Disk(" + string(_driveletter) + ")")
 			if temp_p.Part_type == 'E' {
 				ebr.Part_mount = int8(-1)
 				ebr.Part_fit = _fit

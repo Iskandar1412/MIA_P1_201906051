@@ -12,10 +12,10 @@ func FilesCommandProps(file string, instructions []string) {
 	var _path string //mkfile remove edit rename mkdir copy move find
 	//existe -r 		//mkfile mkdir
 	var _r bool
-	var _size int32  //mkfile
-	var _cont string //mkfile
+	var _size int32    //mkfile
+	var _cont string   //mkfile
+	var _file []string //cat
 	/*
-		var _file []string  //cat
 		var _cont string    //edit
 		var _name string    //rename find
 		var _destino string //move   copy
@@ -29,7 +29,13 @@ func FilesCommandProps(file string, instructions []string) {
 		}
 
 	} else if strings.ToUpper(file) == "CAT" {
-
+		_file, _er = Values_CAT(instructions)
+		if !_er {
+			color.Yellow("[CAT]: Error to asign values")
+			return
+		} else {
+			CAT_EXECUTE(_file)
+		}
 	} else if strings.ToUpper(file) == "REMOVE" {
 
 	} else if strings.ToUpper(file) == "EDIT" {
@@ -37,7 +43,13 @@ func FilesCommandProps(file string, instructions []string) {
 	} else if strings.ToUpper(file) == "RENAME" {
 
 	} else if strings.ToUpper(file) == "MKDIR" {
-
+		_path, _r, _er = Values_MKDIR(instructions)
+		if !_er {
+			color.Yellow("[MKDIR]: Error to asign")
+			return
+		} else {
+			MKDIR_EXECUTE("MKDIR", _path, _r)
+		}
 	} else if strings.ToUpper(file) == "COPY" {
 
 	} else if strings.ToUpper(file) == "MOVE" {
@@ -64,8 +76,6 @@ func PermissionsCommandProps(permission string, instructions []string) {
 		fmt.Println("CHGRP")
 	} else if strings.ToUpper(permission) == "CHMOD" {
 		fmt.Println("CHMOD")
-	} else if strings.ToUpper(permission) == "PAUSE" {
-		fmt.Println("PAUSE")
 	} else {
 		color.Red("[PermissionsCommandProps]: Internal Error")
 	}

@@ -1,6 +1,7 @@
 package comandos
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/fatih/color"
@@ -23,6 +24,9 @@ func GlobalCom(lista []string) {
 		} else if strings.HasPrefix(strings.ToLower(comm), "mount") {
 			comandos := ObtenerComandos(comm)
 			DiskCommandProps("MOUNT", comandos)
+			for _, uval := range Partitions_Mounted {
+				fmt.Println(uval)
+			}
 		} else if strings.HasPrefix(strings.ToLower(comm), "unmount") {
 			comandos := ObtenerComandos(comm)
 			DiskCommandProps("UNMOUNT", comandos)
@@ -72,8 +76,7 @@ func GlobalCom(lista []string) {
 			comandos := ObtenerComandos(comm)
 			PermissionsCommandProps("CHMOD", comandos)
 		} else if strings.HasPrefix(strings.ToLower(comm), "pause") {
-			comandos := ObtenerComandos(comm)
-			PermissionsCommandProps("PAUSE", comandos)
+			Pause()
 			// Usuarios
 		} else if strings.HasPrefix(strings.ToLower(comm), "login") {
 			comandos := ObtenerComandos(comm)

@@ -32,6 +32,7 @@ func Values_MKDISK(instructions []string) (int32, byte, byte) {
 			_unit = value
 		} else {
 			color.Yellow("[MKDISK]: Atributo no reconocido")
+			return -1, '0', '0'
 		}
 	}
 	return _size, _fit, _unit
@@ -44,7 +45,7 @@ func MKDISK_Create(_size int32, _fit byte, _unit byte) {
 		archivo := directorio + letra
 		if _, err := os.Stat(archivo); os.IsNotExist(err) {
 			CreateFile(archivo, _size, _fit, _unit)
-			color.Green("[MKDISK]: Disco '" + letra + "' Creado")
+			color.Green("[MKDISK]: Disco '" + letra + "' Creado -> S(" + fmt.Sprint(_size) + ") U(" + string(_unit) + ")")
 			break
 		} else {
 			continue
@@ -114,7 +115,7 @@ func Values_RMDISK(instructions []string) (byte, bool) {
 func RMDISK_EXECUTE(_driveletter byte) {
 	PATH := "MIA/P1/Disks/" + string(_driveletter) + ".dsk"
 	if _, err := os.Stat(PATH); os.IsNotExist(err) {
-		color.Red("[RMDISK]: No existe el disco")
+		color.Red("[RMDISK]: No existe el disco -> " + string(_driveletter))
 		return
 	}
 	err := os.Remove(PATH)
@@ -161,13 +162,13 @@ func MOUNT_EXECUTE(_driveletter byte, _name []byte) {
 	//obtener disco
 	tempDisk, existe := ObtainMBRDisk(path)
 	if !existe {
-		color.Red("[MOUNT]: Error en la obtención del disco")
+		color.Red("[MOUNT]: Error en la obtención del disco -> " + path)
 		return
 	}
 
 	conjunto, error := BuscarParticion(tempDisk, _name, path)
 	if error {
-		color.Red("[MOUNT]: Partición no encontrada")
+		color.Red("[MOUNT]: Partición no encontrada -> " + path)
 		return
 	}
 
@@ -219,7 +220,6 @@ func MOUNT_EXECUTE(_driveletter byte, _name []byte) {
 	nombre_bytes := DevolverNombreByte(nombre_particion_montada)
 	var arr_partition []string
 	arr_partition = append(arr_partition, nombre_particion_montada, ToString(_name), string(_driveletter), path)
-	Partitions_Mounted = append(Partitions_Mounted, arr_partition)
 
 	color.Magenta("Montando partición... " + nombre_particion_montada + ", de la particion: " + ToString(_name))
 
@@ -239,10 +239,12 @@ func MOUNT_EXECUTE(_driveletter byte, _name []byte) {
 		particion.Part_id = [4]byte(nombre_bytes[:])
 		Escribir_Particion("MOUNT", path, particion, conjunto[1].(int32))
 		if particion.Part_type == 'E' {
-			color.Cyan("Particion Extendida a montar")
+			color.Red("[MOUNT]: No se puede montar una partición extendida")
 			return
 		}
 	}
+
+	Partitions_Mounted = append(Partitions_Mounted, arr_partition)
 
 	inicio := int32(0)
 	if conjunto[0] != nil {

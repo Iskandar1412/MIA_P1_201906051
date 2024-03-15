@@ -34,6 +34,22 @@
             "mode": "auto",
             "args": [],
             "program": "/home/iskandar/Escritorio/Proyectos/Git/MIA_1S2024_201906051/Proyectos/MIA_P1_201906051/comandos/reports-tree-utils.go"
+        },
+        {
+            "type": "go",
+            "name": "debug file-permitions-commands-props.go",
+            "request": "launch",
+            "mode": "auto",
+            "args": [],
+            "program": "/home/iskandar/Escritorio/Proyectos/Git/MIA_1S2024_201906051/Proyectos/MIA_P1_201906051/comandos/file-permitions-commands-props.go"
+        },
+        {
+            "type": "go",
+            "name": "debug disk-utils.go",
+            "request": "launch",
+            "mode": "auto",
+            "args": [],
+            "program": "/home/iskandar/Escritorio/Proyectos/Git/MIA_1S2024_201906051/Proyectos/MIA_P1_201906051/comandos/disk-utils.go"
         }
     ]
 }

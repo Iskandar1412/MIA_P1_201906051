@@ -2,6 +2,9 @@ package main
 
 import (
 	"MIA_P1_201906051/comandos"
+	"bufio"
+	"fmt"
+	"os"
 
 	"strings"
 
@@ -18,11 +21,13 @@ func main() {
 	color.Blue("PROY1 - 201906051 - Juan Urbina")
 	comandos.CrearCarpeta()
 	for {
-		input := "execute -path=Pruebas/prueba.adsj"
-		// reader := bufio.NewReader(os.Stdin)
-		// fmt.Print("Ingresar comando EXECUTE (exit para salir): >")
-		// input, _ := reader.ReadString('\n')
-		// input = strings.TrimSpace(input)
+		// input := "execute -path=Pruebas/prueba.adsj"
+		// input := "execute -path=Pruebas/avanzado.asdj"
+		//----------------------------
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Ingresar comando EXECUTE (exit para salir): >")
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
 		if strings.ToLower(input) == "exit" {
 			color.Cyan("Saliendo del programa")
 			//color.Cyan(particiones_montadas)

@@ -80,13 +80,13 @@ func TieneUnit(command string, unit string) byte {
 		return '0'
 	}
 	if strings.ToUpper(value[1]) == "B" {
-		if command == "mkdisk" {
-			color.Red("[" + command + "]: No tiene Unit Valido")
+		if command == "MKDISK" {
+			color.Red("[MKDISK]: No tiene Unit Valido -> B")
 			return 'M'
-		} else if command == "fdisk" {
+		} else if command == "FDISK" {
 			return 'B'
 		} else {
-			color.Red("[" + command + "]: No tiene Unit Valido")
+			color.Red("[" + command + "]: No tiene Unit Valido -> B")
 			return 'K'
 		}
 	} else if strings.ToUpper(value[1]) == "K" {
@@ -94,7 +94,7 @@ func TieneUnit(command string, unit string) byte {
 	} else if strings.ToUpper(value[1]) == "M" {
 		return 'M'
 	} else {
-		color.Red("[" + command + "]: No tiene Unit Valido")
+		color.Red("[" + command + "]: No tiene Unit Valido -> Other Value")
 		return '0'
 	}
 }

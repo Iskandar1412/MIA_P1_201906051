@@ -5,7 +5,7 @@
 #MKdisK -Size=15 -unit=M -fit=bF
 #fdisk -name=Parte2 -driveletter=A -size=4 -unit=M -type=E
 #Fdisk -name="Part1" -driveletter=A -size=2 -unit=M -type=P  #-delete=FULL
-#Fdisk -name="Part3" -driveletter=A -size=600 -type=P 
+#Fdisk -name="Part3" -driveletter=A -size=900 -type=P 
 #Fdisk -name="Part5" -driveletter=A -size=800 -type=P 
 #fdisk -driveletter=A -size=12 -name=asdf -type=L
 #fdisk -driveletter=A -size=12 -name=asdf -type=L
@@ -21,16 +21,20 @@
 #fdisk -driveletter=B -size=12 -name=asdf -type=L
 #fdisk -driveletter=B -size=450 -unit=k -name=ind -type=L
 
-##fdisk -driveletter=A -delete=full -name=Parte2
-##fdisk -driveletter=A -add=500 -size=10 -unit=k -name=asdf
+#fdisk -driveletter=A -delete=full -name=Parte2
+#fdisk -driveletter=A -add=500 -size=10 -unit=k -name=asdf
 
 #Montar particiones
-mount -driveletter=A -name=asdf
-#mount -driveletter=B -name=Part55
-mount -driveletter=A -name=Part1
-#mount -driveletter=B -name=Part9
-mount -driveletter=A -name=Part3
-mount -name=Parte2 -driveletter=A
+mount -driveletter=B -name=Part55 #B151
+mount -driveletter=B -name=Part9 #B251
+#pause
+ 
+mount -driveletter=A -name=Part1 #A151
+mount -driveletter=A -name=Part3 #A251
+mount -driveletter=A -name=Part5 #A351
+mount -name=Parte2 -driveletter=A #ERR
+
+
 
 
 #Desmontar particiones
@@ -40,26 +44,39 @@ mount -name=Parte2 -driveletter=A
 #unmount -id=A451
 
 #Formateo de disco MKFS
-#mkfs -id=A151 -fs=3fs
+#pause
+#pause
+mkfs -id=A151 -fs=3fs
 mkfs -id=A351 -type=full
-mkfs -id=A451 -type=full
 mkfs -id=A251 -fs=3fs -type=full
+
+#pause
+login -user=root -pass=123 -id=A351
+cat -file1=/users.txt
+rep -id=A351 -path=MIA/P1/Reports/journal.jpg -name=journaling
+logout
+
 
 login -user=root -pass=123 -id=A251
 mkgrp -name=grupoB
 mkgrp -name=grupoC
+#cat -file1=/users.txt
+#pause
 rmgrp -name=grupoC
 mkusr -user=super -pass=123 -grp=grupoB
 mkusr -user=iskandar -pass=123 -grp=grupoB
+#cat -file1=/users.txt
 rmusr -user=super
-#mkusr -user=kim -pass=123 -grp=grupoB
-logout
-login -user=iskandar -pass=123 -id=A251
-mkfile -size=15 -path=/home/user/docs/a.txt -r
-mkfile -path=/home/user/docs/a.txt -r -cont=a.txt
+#cat -file1=/users.txt
+mkusr -user=kim -pass=123 -grp=grupoB
+cat -file1=/users.txt
 
-#mkgrp -name=grupoA
-
+mkdir -path=/home
+mkdir -path=/Nano
+mkdir -path=/home/iskandar -r
+mkfile -size=30 -path=/Nano/eme.txt
+mkfile -size=5 -path=/home/iskandar/prueba.txt
+cat -file1=/Nano/eme.txt -file2=/home/iskandar/prueba.txt
 rep -id=A251 -path=MIA/P1/Reports/imagen1.jpg -name=mbr
 rep -id=A251 -path=MIA/P1/Reports/imagen2.jpg -name=disk
 rep -id=A251 -path=MIA/P1/Reports/imagen3.jpg -name=inode
@@ -70,5 +87,31 @@ rep -id=A251 -path=MIA/P1/Reports/bmblocks.txt -name=bm_block
 rep -id=A251 -path=MIA/P1/Reports/file.txt -name=file
 rep -id=A251 -path=MIA/P1/Reports/tree.jpg -name=tree
 rep -id=A251 -path=MIA/P1/Reports/ls.jpg -name=ls
-rep -id=A251 -path=MIA/P1/Reports/journal.jpg -name=journaling
+logout
 
+
+#pause
+login -user=iskandar -pass=123 -id=A251
+mkfile -size=15 -path=/home/user/docs/a.txt -r
+mkfile -path=/home/user/docs/b.txt -r -cont=a.txt
+
+
+mkdir -path=/Nano
+mkdir -path=/home/iskandar -r
+mkfile -size=30 -path=/Nano/eme.txt
+mkfile -size=5 -path=/home/iskandar/prueba.txt
+cat -file1=/Nano/eme.txt -file2=/home/iskandar/prueba.txt -file3=/home/user/docs/a.txt
+#mkgrp -name=grupoA
+
+rep -id=A251 -path=MIA/P1/Reports/imagen1_2.jpg -name=mbr
+rep -id=A251 -path=MIA/P1/Reports/imagen2_2.jpg -name=disk
+rep -id=A251 -path=MIA/P1/Reports/imagen3_2.jpg -name=inode
+rep -id=A251 -path=MIA/P1/Reports/imagen4_2.jpg -name=sb
+rep -id=A251 -path=MIA/P1/Reports/imagen5_2.jpg -name=block
+rep -id=A251 -path=MIA/P1/Reports/bminodes_2.txt -name=bm_inode
+rep -id=A251 -path=MIA/P1/Reports/bmblocks_2.txt -name=bm_block
+rep -id=A251 -path=MIA/P1/Reports/file_2.txt -name=file
+rep -id=A251 -path=MIA/P1/Reports/tree_2.jpg -name=tree
+rep -id=A251 -path=MIA/P1/Reports/ls_2.jpg -name=ls
+rep -id=A251 -path=MIA/P1/Reports/journal_2.jpg -name=journaling
+logout
